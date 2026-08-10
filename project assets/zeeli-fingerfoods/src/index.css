@@ -1,0 +1,22 @@
+/* Modernist is the source of truth for every color, font, space and radius.
+   Anything below this import is app chrome, not a new set of tokens. */
+@import './styles/modernist.css';
+
+#root {
+  /* Full-height column so the app's side rules and the category sidebar's
+     divider run the whole page, not just as far as the content reaches. */
+  min-height: 100dvh;
+}
+
+body {
+  /* Mobile-first: most traffic lands from the Instagram bio link on a phone,
+     so the whole app is a single centred column that stops growing on desktop. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
