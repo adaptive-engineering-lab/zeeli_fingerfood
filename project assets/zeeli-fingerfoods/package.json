@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "oxlint && npm run check:design",
     "check:design": "node scripts/check-design-adherence.mjs",
+    "verify:permissions": "node scripts/verify-order-permissions.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"

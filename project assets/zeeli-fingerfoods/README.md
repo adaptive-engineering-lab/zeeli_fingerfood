@@ -103,8 +103,9 @@ Admin routes (`/admin`) are not built yet — Phases 2 and 6.
 
 - **Menu**: if Supabase is unconfigured or the read fails, `src/features/menu/menuData.js`
   is shown and the page says it's a sample menu. The Instagram link never lands on a blank page.
-- **Order write**: a failed insert never blocks the WhatsApp handoff — the customer
+- **Order write**: a failed write never blocks the WhatsApp handoff — the customer
   still gets their pre-filled message and the confirmation screen says the copy wasn't saved.
+  `submitOrder` is contracted never to throw.
 - **WhatsApp deep link**: if `window.open` is blocked (desktop, popup blockers),
   checkout shows the order as copyable text plus the vendor's number.
 
@@ -112,7 +113,27 @@ Admin routes (`/admin`) are not built yet — Phases 2 and 6.
 - Vendor's WhatsApp number (`VITE_VENDOR_WHATSAPP_NUMBER` in `.env` is still the `234000…` placeholder)
 - Real category list + menu items (seed via the admin panel once Phase 2 is built)
 - Which items have size/pack variants, and their labels/prices
-- **RLS on `orders`**: a guest checkout insert currently fails with
-  `42501 new row violates row-level security policy for table "orders"`, so no order
-  reaches the dashboard. The public **insert** policy on `orders` and `order_items`
-  still needs to be applied (PRD §7).
+
+## How a guest order is recorded
+
+Shipped as [specs/001-guest-order-persistence](../../specs/001-guest-order-persistence/).
+
+Checkout calls one database function, `place_order`, which is the **sole write path**
+for orders. It inserts the order and every line in a single transaction and returns
+the stored short reference. Customers hold **no** direct write permission on `orders`
+or `order_items` and no read permission at all — the function decides `status`,
+`subtotal` and every `line_total` itself.
+
+The client must not ask for the row back: Postgres applies `SELECT` policies to
+`RETURNING` rows, so the earlier "insert, read the id, insert the lines" path was
+rejected outright and recorded nothing. `src/features/checkout/orderPayload.js` builds
+the call (pure, unit-tested); `submitOrder.js` makes it and never throws.
+
+Verify the permission boundary against the live project with the same publishable key
+a visitor's browser holds:
+
+```bash
+npm run verify:permissions   # 9 assertions; writes ZF-PROBE… rows, see the script header for cleanup
+```
+
+Migration: `supabase/migrations/20260810__place_order_rpc.sql`.

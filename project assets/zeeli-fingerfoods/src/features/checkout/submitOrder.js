@@ -1,53 +1,44 @@
 import { supabase } from '../../lib/supabaseClient'
-import { lineTotal } from '../cart/cartMath'
+import { toOrderPayload } from './orderPayload'
 
 /**
- * Writes the order to Supabase so the admin dashboard has it. Never throws:
- * WhatsApp is the channel that actually reaches the vendor, so a failed write
- * must not block the handoff — the caller surfaces `persisted: false` instead.
+ * Records the order through `place_order`, the sole write path (see
+ * specs/001-guest-order-persistence). One call, one transaction: the order and all
+ * its lines commit together or not at all.
+ *
+ * Never throws. WhatsApp is the channel that actually reaches the vendor, so a failed
+ * write must not block the handoff — the caller gets `persisted: false` and carries on
+ * with the reference it generated locally.
+ *
+ * Returns `{ persisted, shortRef, error? }`. On success `shortRef` is the reference
+ * actually stored, which may differ from the one proposed if it collided.
  */
 export default async function submitOrder(order) {
+  const fallback = { persisted: false, shortRef: order.shortRef }
+
   if (!supabase) {
-    return { persisted: false, error: new Error('Supabase is not configured') }
+    return { ...fallback, error: new Error('Supabase is not configured') }
   }
 
   try {
-    const { data, error } = await supabase
-      .from('orders')
-      .insert({
-        short_ref: order.shortRef,
-        customer_name: order.customerName,
-        customer_phone: order.customerPhone,
-        fulfillment_type: order.fulfillmentType,
-        address: order.fulfillmentType === 'delivery' ? order.address : null,
-        note: order.note?.trim() || null,
-        subtotal: order.subtotal,
-        status: 'new',
-      })
-      .select('id')
-      .single()
+    // Inside the try on purpose: building the payload touches caller-supplied
+    // fields, and this function is contracted never to throw.
+    const payload = toOrderPayload({
+      form: order,
+      lines: order.lines,
+      shortRef: order.shortRef,
+    })
 
+    if (!payload) {
+      return { ...fallback, error: new Error('Nothing recordable in this order') }
+    }
+
+    const { data, error } = await supabase.rpc('place_order', payload)
     if (error) throw error
 
-    const { error: itemsError } = await supabase.from('order_items').insert(
-      order.lines.map((line) => ({
-        order_id: data.id,
-        menu_item_id: line.itemId,
-        variant_id: line.variantId,
-        // Snapshots: the item or variant may be renamed or deleted later.
-        item_name_snapshot: line.name,
-        variant_label_snapshot: line.variantLabel,
-        unit_price_snapshot: line.unitPrice,
-        quantity: line.quantity,
-        line_total: lineTotal(line),
-      }))
-    )
-
-    if (itemsError) throw itemsError
-
-    return { persisted: true, orderId: data.id }
+    return { persisted: true, shortRef: data ?? order.shortRef }
   } catch (error) {
     console.error('Order write failed; continuing to WhatsApp anyway:', error)
-    return { persisted: false, error }
+    return { ...fallback, error }
   }
 }

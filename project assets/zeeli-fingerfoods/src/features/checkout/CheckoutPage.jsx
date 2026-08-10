@@ -50,14 +50,25 @@ export default function CheckoutPage() {
 
     setSending(true)
     const order = { ...form, lines, subtotal, shortRef: makeShortRef() }
-    const message = buildOrderMessage(order)
+
+    // Record first, then build the message: `place_order` returns the reference
+    // actually stored, which differs from the one we proposed if it collided. The
+    // customer must quote a reference the vendor can find (FR-015). When recording
+    // fails there is no stored record to disagree with, so the local one stands.
+    const { persisted, shortRef } = await submitOrder(order)
+
+    const message = buildOrderMessage({ ...order, shortRef })
     const url = buildWhatsAppUrl(vendorNumber(), message)
 
-    const { persisted } = await submitOrder(order)
+    // Deliberately NOT `window.open(url, '_blank', 'noopener')`: the noopener
+    // feature makes window.open return null even on success, so the fallback below
+    // fired on every desktop checkout. Sever the opener by hand instead, which
+    // keeps reverse-tabnabbing closed and leaves null meaning "actually blocked".
+    const opened = window.open(url, '_blank')
+    if (opened) opened.opener = null
 
     // Mostly desktop browsers without a WhatsApp Web session, or a popup
     // blocker: fall back to a copyable summary rather than losing the order.
-    const opened = window.open(url, '_blank', 'noopener')
     if (!opened) {
       setFallback({ message, url })
       setSending(false)
@@ -65,7 +76,7 @@ export default function CheckoutPage() {
     }
 
     clear()
-    navigate('/order-sent', { state: { shortRef: order.shortRef, persisted } })
+    navigate('/order-sent', { state: { shortRef, persisted } })
   }
 
   if (itemCount === 0 && !fallback) {
