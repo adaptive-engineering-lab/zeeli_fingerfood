@@ -49,8 +49,8 @@ See [research Finding 0](./research.md#finding-0-shipping-sign-in-would-open-a-p
 
 **Purpose**: somewhere for the admin tree to live, behind a lazy boundary from the start
 
-- [ ] T001 Create `src/features/admin/` with a placeholder `AdminApp.jsx` that renders nothing yet
-- [ ] T002 Wire `/admin/*` into `src/App.jsx` via `React.lazy` + `Suspense`, importing **only** from
+- [x] T001 Create `src/features/admin/` with a placeholder `AdminApp.jsx` that renders nothing yet
+- [x] T002 Wire `/admin/*` into `src/App.jsx` via `React.lazy` + `Suspense`, importing **only** from
       `features/admin/` so the split boundary is established before anything is built behind it
 
 ---
@@ -63,16 +63,16 @@ See [research Finding 0](./research.md#finding-0-shipping-sign-in-would-open-a-p
 
 ### The admin predicate (security-critical)
 
-- [ ] T003 Write `supabase/migrations/20260811a__admin_identity.sql`: `admins` table (PK `user_id`
+- [x] T003 Write `supabase/migrations/20260811a__admin_identity.sql`: `admins` table (PK `user_id`
       FK → `auth.users` ON DELETE CASCADE, `email`, `created_at`), RLS enabled with **no client
       policy**, per [data-model.md](./data-model.md#new-publicadmins)
-- [ ] T004 In the same migration add `public.is_admin()` — `stable security definer`,
+- [x] T004 In the same migration add `public.is_admin()` — `stable security definer`,
       `search_path = public, pg_temp` — then `revoke execute from public` and grant to `anon,
       authenticated`, per [contracts/admin-auth.md](./contracts/admin-auth.md#1-publicis_admin)
-- [ ] T005 In the same migration repoint **all nine** policies from `auth.role() = 'authenticated'`
+- [x] T005 In the same migration repoint **all nine** policies from `auth.role() = 'authenticated'`
       to `public.is_admin()`: 3 on the catalogue tables, 2 on `orders`, 1 on `order_items`, 3 on
       `storage.objects`
-- [ ] T006 Apply migration `20260811a` and verify: nine policies now reference `is_admin()`, zero
+- [x] T006 Apply migration `20260811a` and verify: nine policies now reference `is_admin()`, zero
       still reference `auth.role()`, and `admins` is unreadable by `anon`
 - [ ] T007 In the Supabase dashboard: **disable self-signup**, set magic-link/OTP validity to
       **15 minutes**, and confirm the refresh-token lifetime outlasts **30 days** (FR-004, FR-005).
@@ -82,14 +82,14 @@ See [research Finding 0](./research.md#finding-0-shipping-sign-in-would-open-a-p
 
 ### Soft removal
 
-- [ ] T009 Write and apply `supabase/migrations/20260811b__soft_removal.sql`: add
+- [x] T009 Write and apply `supabase/migrations/20260811b__soft_removal.sql`: add
       `menu_items.removed_at timestamptz`, a partial index on `(category_id, sort_order) where
       removed_at is null`, and narrow the public read policy to
       `is_available = true and removed_at is null` (FR-016)
 
 ### Catalogue integrity (added after analysis)
 
-- [ ] T051 Write and apply `supabase/migrations/20260811d__catalogue_constraints.sql`. Two jobs, both
+- [x] T051 Write and apply `supabase/migrations/20260811d__catalogue_constraints.sql`. Two jobs, both
       repairing gaps the analysis found between `data-model.md` and the live schema:
       **(a)** add the `check` constraints the data model claimed but which **do not exist** — name
       non-blank, price > 0 when not sized, a sized item carries no base price, size label non-blank,
@@ -101,10 +101,10 @@ See [research Finding 0](./research.md#finding-0-shipping-sign-in-would-open-a-p
       `removed_at is null` still references it. A trigger rather than `on delete restrict`, because
       FR-030 must still allow removing a category that holds only removed items
       ([research D12](./research.md#d12-enforcing-the-catalogue-rules-in-the-database))
-- [ ] T052 Write and apply `supabase/migrations/20260811e__photo_sizes.sql`: add
+- [x] T052 Write and apply `supabase/migrations/20260811e__photo_sizes.sql`: add
       `menu_items.image_card_url text` alongside the existing `image_url`, so each photo can be
       stored at two sizes (FR-035)
-- [ ] T060 Write and apply `supabase/migrations/20260811f__save_menu_item.sql`: the
+- [x] T060 Write and apply `supabase/migrations/20260811f__save_menu_item.sql`: the
       `save_menu_item` RPC per [contracts/catalogue.md](./contracts/catalogue.md#5-save_menu_item--the-one-write-that-cannot-be-two-calls).
       Writes the item and reconciles its sizes in one transaction, because from the browser those are
       two round trips and a failure between them leaves a sized item with **no price**, still
@@ -115,11 +115,11 @@ See [research Finding 0](./research.md#finding-0-shipping-sign-in-would-open-a-p
 
 ### Repair to feature 001
 
-- [ ] T010 Write and apply `supabase/migrations/20260811c__place_order_fk_guard.sql`: `place_order`
+- [x] T010 Write and apply `supabase/migrations/20260811c__place_order_fk_guard.sql`: `place_order`
       stores `null` for a `menu_item_id` or `variant_id` that no longer resolves, instead of
       raising. Without this, discarding an item that sits in a customer's cart makes their **entire
       order go unrecorded** — see [research D9](./research.md#d9-discard-vs-a-customers-in-flight-order)
-- [ ] T011 Confirm 001's own tests and `npm run verify:permissions` still pass unchanged after T010
+- [x] T011 Confirm 001's own tests and `npm run verify:permissions` still pass unchanged after T010
 
 ### Proving the boundary
 
