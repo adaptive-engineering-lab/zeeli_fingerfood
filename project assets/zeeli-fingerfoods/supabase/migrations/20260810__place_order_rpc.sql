@@ -11,6 +11,15 @@
 -- function is the only write path, and it decides `status`, `subtotal` and
 -- `line_total` itself. That is strictly less privilege than before, when
 -- `WITH CHECK true` let any crafted request write an order marked 'fulfilled'.
+--
+-- EXPECTED LINTER WARNINGS — do not "fix" these; doing so breaks guest checkout:
+--   0028_anon_security_definer_function_executable
+--   0029_authenticated_security_definer_function_executable
+-- Both flag that `place_order` is callable by anon/authenticated as SECURITY
+-- DEFINER. That is the entire point: guests are unauthenticated, hold no table
+-- write permission, and this function is the only way an order can be recorded.
+-- Switching it to SECURITY INVOKER or revoking EXECUTE would stop every order.
+-- The boundary it guards is verified by `npm run verify:permissions`.
 
 create or replace function public.place_order(
   p_short_ref        text,

@@ -109,10 +109,22 @@ Admin routes (`/admin`) are not built yet — Phases 2 and 6.
 - **WhatsApp deep link**: if `window.open` is blocked (desktop, popup blockers),
   checkout shows the order as copyable text plus the vendor's number.
 
+## Catalogue data
+
+`supabase/seed.sql` holds **provisional** categories, items and variants — the ones
+drawn in the wireframes, not a menu the vendor has confirmed. It uses fixed ids, so
+it is idempotent and order lines keep pointing at the same items across re-runs.
+
+It exists so the live read path is exercised and order lines record real
+`menu_item_id` / `variant_id` values instead of nulls. Every price in it is a
+placeholder. The admin panel (PRD phase 2) is how the vendor replaces it.
+
 ## Still needed before this is customer-ready
-- Vendor's WhatsApp number (`VITE_VENDOR_WHATSAPP_NUMBER` in `.env` is still the `234000…` placeholder)
-- Real category list + menu items (seed via the admin panel once Phase 2 is built)
-- Which items have size/pack variants, and their labels/prices
+- **Vendor's WhatsApp number** — `VITE_VENDOR_WHATSAPP_NUMBER` is still the `234000…`
+  placeholder, so checkout opens a chat with nobody. This is the last thing between
+  the app and a working site.
+- Confirmed category list, items and prices to replace `supabase/seed.sql`
+- Which items really have size/pack variants, and their labels/prices (PRD §11)
 
 ## How a guest order is recorded
 
@@ -137,3 +149,11 @@ npm run verify:permissions   # 9 assertions; writes ZF-PROBE… rows, see the sc
 ```
 
 Migration: `supabase/migrations/20260810__place_order_rpc.sql`.
+
+**The Supabase linter flags this function twice and both warnings are expected**
+(`0028_anon_security_definer_function_executable`,
+`0029_authenticated_security_definer_function_executable`). They report that
+`place_order` is callable by unauthenticated users as a `SECURITY DEFINER` function —
+which is the design. Guests are never signed in, hold no table write permission, and
+this is the only route by which an order can be recorded. Revoking `EXECUTE` or
+switching to `SECURITY INVOKER` stops every order reaching the vendor.

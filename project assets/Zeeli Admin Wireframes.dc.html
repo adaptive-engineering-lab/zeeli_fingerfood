@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/modernist-00e18927-3434-42da-9589-c7e93e06f4b7/styles.css">
+<script src="_ds/modernist-00e18927-3434-42da-9589-c7e93e06f4b7/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)}
+a{color:var(--color-accent-700)}
+a:hover{color:var(--color-accent)}
+.dv-turn{padding:40px 44px 32px;border-bottom:2px solid var(--color-text);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 22px}
+.dv-tid{font:700 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:var(--color-text);color:#fff;text-decoration:none}
+.dv-tname{font:700 13px/1.2 var(--font-heading);color:var(--color-text);text-transform:uppercase;letter-spacing:.03em}
+.dv-opts{display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:700 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:var(--color-neutral-200);color:var(--color-text);text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 var(--font-body);color:var(--color-neutral-600)}
+.dv-card{max-width:100%;background:var(--color-bg);border:2px solid var(--color-text);overflow:hidden}
+.dv-opt:target .dv-oid{background:var(--color-accent);color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.5 var(--font-body);color:var(--color-neutral-600)}
+.frames{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.flabel{font:700 10px var(--font-body);color:var(--color-neutral-600);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.ph{background:repeating-linear-gradient(45deg,var(--color-neutral-300) 0 6px,var(--color-neutral-200) 6px 12px);border:1px solid var(--color-neutral-400);display:flex;align-items:center;justify-content:center;font:700 8px var(--font-body);color:var(--color-neutral-600);text-transform:uppercase;letter-spacing:.04em}
+.chrome{height:22px;border-bottom:2px solid var(--color-text);display:flex;align-items:center;gap:4px;padding:0 8px}
+.dot{width:6px;height:6px;background:var(--color-neutral-400);display:inline-block}
+.abar{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:2px solid var(--color-text)}
+.abrand{font:800 12px var(--font-heading);text-transform:uppercase;letter-spacing:.03em}
+.atab{font:700 9px var(--font-body);text-transform:uppercase;letter-spacing:.03em;color:var(--color-neutral-600)}
+.atab.on{color:var(--color-accent-700);border-bottom:2px solid var(--color-accent);padding-bottom:2px}
+.fld{display:flex;flex-direction:column;gap:3px}
+.flab{font:700 8px var(--font-body);text-transform:uppercase;letter-spacing:.04em;color:var(--color-neutral-600)}
+.fbox{border:1.5px solid var(--color-text);padding:6px 8px;font:400 9px var(--font-body);color:var(--color-neutral-400)}
+.fval{border:1.5px solid var(--color-text);padding:6px 8px;font:400 9px var(--font-body);color:var(--color-text)}
+.btnp{background:var(--color-accent);color:#fff;padding:7px 12px;font:700 9px var(--font-body);text-transform:uppercase;letter-spacing:.03em;text-align:left}
+.btns{border:1.5px solid var(--color-text);padding:6px 11px;font:700 9px var(--font-body);text-transform:uppercase;letter-spacing:.03em}
+.th{font:700 8px var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--color-neutral-600);text-align:left;padding:5px 0;border-bottom:2px solid var(--color-text)}
+.td{font:400 9px var(--font-body);padding:6px 0;border-bottom:1px solid var(--color-neutral-300)}
+.sw{width:22px;height:12px;background:var(--color-accent);position:relative;display:inline-block}
+.sw::after{content:"";position:absolute;top:2px;right:2px;width:8px;height:8px;background:#fff}
+.sw.off{background:var(--color-neutral-400)}
+.sw.off::after{right:auto;left:2px}
+.tagn{font:700 7.5px var(--font-body);text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;background:var(--color-neutral-200);color:var(--color-neutral-800)}
+.taga{font:700 7.5px var(--font-body);text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;background:var(--color-accent-100);color:var(--color-accent-800)}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t4">
+<div class="dv-thd"><a class="dv-tid" href="#t4">4</a><span class="dv-tname">Admin sign-in</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="4a">
+<div class="dv-olabel"><a class="dv-oid" href="#4a">4a</a>Centred card, ruled top</div>
+<div class="dv-card">
+<div class="frames" style="padding:16px">
+<div>
+<div class="flabel">Desktop</div>
+<div style="width:520px;height:300px;border:2px solid var(--color-text);background:var(--color-bg);display:flex;flex-direction:column">
+<div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<div style="flex:1;display:flex;align-items:center;justify-content:center">
+<div style="width:250px;border:2px solid var(--color-text);padding:16px;display:flex;flex-direction:column;gap:10px">
+<div style="font:800 13px var(--font-heading);text-transform:uppercase;letter-spacing:.03em">Zeeli Admin</div>
+<div style="height:2px;background:var(--color-text)"></div>
+<div class="fld"><span class="flab">Email</span><span class="fbox">you@zeeli.ng</span></div>
+<div class="fld"><span class="flab">Password</span><span class="fbox">••••••••</span></div>
+<span class="btnp">Sign In</span>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="flabel">Mobile</div>
+<div style="width:260px;height:300px;border:2px solid var(--color-text);display:flex;flex-direction:column;justify-content:center;padding:14px;gap:10px">
+<div style="font:800 12px var(--font-heading);text-transform:uppercase;letter-spacing:.03em">Zeeli Admin</div>
+<div style="height:2px;background:var(--color-text)"></div>
+<div class="fld"><span class="flab">Email</span><span class="fbox">you@zeeli.ng</span></div>
+<div class="fld"><span class="flab">Password</span><span class="fbox">••••••••</span></div>
+<span class="btnp">Sign In</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="4b">
+<div class="dv-olabel"><a class="dv-oid" href="#4b">4b</a>Split panel, red poster left</div>
+<div class="dv-card">
+<div class="frames" style="padding:16px">
+<div>
+<div class="flabel">Desktop</div>
+<div style="width:520px;height:300px;border:2px solid var(--color-text);display:flex;flex-direction:column">
+<div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<div style="flex:1;display:flex">
+<div style="width:200px;background:var(--color-accent);color:#fff;padding:16px;display:flex;flex-direction:column;justify-content:space-between;border-right:2px solid var(--color-text)">
+<div style="font:800 20px/1.05 var(--font-heading);text-transform:uppercase;letter-spacing:-.01em">Zeeli<br>Finger<br>Foods</div>
+<div style="font:700 8px var(--font-body);text-transform:uppercase;letter-spacing:.06em;opacity:.85">Vendor console</div>
+</div>
+<div style="flex:1;padding:18px;display:flex;flex-direction:column;justify-content:center;gap:10px">
+<div style="font:800 12px var(--font-heading);text-transform:uppercase">Sign in</div>
+<div class="fld"><span class="flab">Email</span><span class="fbox">you@zeeli.ng</span></div>
+<div class="fld"><span class="flab">Password</span><span class="fbox">••••••••</span></div>
+<span class="btnp">Sign In</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="4c">
+<div class="dv-olabel"><a class="dv-oid" href="#4c">4c</a>Flush-left, no card, error state</div>
+<div class="dv-card">
+<div class="frames" style="padding:16px">
+<div>
+<div class="flabel">Desktop — error</div>
+<div style="width:520px;height:300px;border:2px solid var(--color-text);display:flex;flex-direction:column">
+<div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<div style="padding:24px 28px;display:flex;flex-direction:column;gap:10px;max-width:280px">
+<div style="font:800 22px var(--font-heading);text-transform:uppercase;letter-spacing:-.01em">Sign in</div>
+<div style="height:2px;background:var(--color-text)"></div>
+<div class="fld"><span class="flab">Email</span><span class="fval">ada@zeeli.ng</span></div>
+<div class="fld"><span class="flab">Password</span><span class="fbox" style="border-color:var(--color-accent)">••••••••</span>
+<span style="font:700 8.5px var(--font-body);color:var(--color-accent-700)">That email and password don’t match.</span></div>
+<span class="btnp">Sign In</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "add a forgot-password route to <a class="dv-oid" href="#4a">4a</a>" · "show the signed-out timeout state" · "new directions"</p>
+</section>
+
+<section class="dv-turn" id="t5">
+<div class="dv-thd"><a class="dv-tid" href="#t5">5</a><span class="dv-tname">Menu management (admin)</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="5a">
+<div class="dv-olabel"><a class="dv-oid" href="#5a">5a</a>Data table, inline availability toggle</div>
+<div class="dv-card">
+<div class="frames" style="padding:16px">
+<div>
+<div class="flabel">Desktop</div>
+<div style="width:640px;border:2px solid var(--color-text)">
+<div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<div class="abar"><span class="abrand">Zeeli Admin</span><span style="display:flex;gap:14px;align-items:baseline"><span class="atab on">Menu</span><span class="atab">Categories</span><span class="atab">Orders</span><span class="atab">Sign out</span></span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:2px solid var(--color-text)">
+<span style="font:800 14px var(--font-heading);text-transform:uppercase;letter-spacing:-.01em">Menu items</span>
+<span class="btnp" style="display:inline-block">+ New item</span>
+</div>
+<div style="padding:10px 12px">
+<div style="display:flex;gap:6px;margin-bottom:8px">
+<span class="taga">All 9</span><span class="tagn">Small Chops 3</span><span class="tagn">Grills 2</span><span class="tagn">Trays 2</span><span class="tagn">Drinks 2</span>
+</div>
+<table style="width:100%;border-collapse:collapse">
+<tr><th class="th">Item</th><th class="th">Category</th><th class="th" style="text-align:right">Price</th><th class="th" style="text-align:center">Available</th><th class="th" style="text-align:right">&nbsp;</th></tr>
+<tr><td class="td" style="display:flex;align-items:center;gap:7px"><span class="ph" style="width:24px;height:24px">Img</span>Puff Puff (6pc)</td><td class="td">Small Chops</td><td class="td" style="text-align:right">₦800</td><td class="td" style="text-align:center"><span class="sw"></span></td><td class="td" style="text-align:right;color:var(--color-accent-700);font-weight:700">Edit</td></tr>
+<tr><td class="td" style="display:flex;align-items:center;gap:7px"><span class="ph" style="width:24px;height:24px">Img</span>Chicken Samosa</td><td class="td">Small Chops</td><td class="td" style="text-align:right">₦1,200</td><td class="td" style="text-align:center"><span class="sw"></span></td><td class="td" style="text-align:right;color:var(--color-accent-700);font-weight:700">Edit</td></tr>
+<tr><td class="td" style="display:flex;align-items:center;gap:7px"><span class="ph" style="width:24px;height:24px">Img</span>Small Chops Combo Tray <span class="tagn">3 sizes</span></td><td class="td">Trays</td><td class="td" style="text-align:right">From ₦3,500</td><td class="td" style="text-align:center"><span class="sw"></span></td><td class="td" style="text-align:right;color:var(--color-accent-700);font-weight:700">Edit</td></tr>
+<tr><td class="td" style="display:flex;align-items:center;gap:7px;color:var(--color-neutral-500)"><span class="ph" style="width:24px;height:24px">Img</span>Chapman</td><td class="td" style="color:var(--color-neutral-500)">Drinks</td><td class="td" style="text-align:right;color:var(--color-neutral-500)">₦1,500</td><td class="td" style="text-align:center"><span class="sw off"></span></td><td class="td" style="text-align:right;color:var(--color-accent-700);font-weight:700">Edit</td></tr>
+</table>
+</div>
+</div>
+</div>
+<div>
+<div class="flabel">Mobile</div>
+<div style="width:280px;border:2px solid var(--color-text)">
+<div class="abar" style="padding:8px 10px"><span class="abrand" style="font-size:11px">Zeeli Admin</span><span class="atab on">Menu</span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:2px solid var(--color-text)"><span style="font:800 11px var(--font-heading);text-transform:uppercase">Menu items</span><span class="btnp" style="padding:5px 9px">+ New</span></div>
+<div style="padding:8px 10px;display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--color-neutral-300)"><span class="ph" style="width:30px;height:30px;flex:none">Img</span><span style="flex:1;display:flex;flex-direction:column"><span style="font:700 9.5px var(--font-body)">Puff Puff (6pc)</span><span style="font:400 8px var(--font-body);color:var(--color-neutral-600)">Small Chops · ₦800</span></span><span class="sw"></span></div>
+<div style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--color-neutral-300)"><span class="ph" style="width:30px;height:30px;flex:none">Img</span><span style="flex:1;display:flex;flex-direction:column"><span style="font:700 9.5px var(--font-body)">Combo Tray</span><span style="font:400 8px var(--font-body);color:var(--color-neutral-600)">Trays · from ₦3,500 · 3 sizes</span></span><span class="sw"></span></div>
+<div style="display:flex;align-items:center;gap:8px;color:var(--color-neutral-500)"><span class="ph" style="width:30px;height:30px;flex:none">Img</span><span style="flex:1;display:flex;flex-direction:column"><span style="font:700 9.5px var(--font-body)">Chapman</span><span style="font:400 8px var(--font-body)">Drinks · ₦1,500</span></span><span class="sw off"></span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="5b">
+<div class="dv-olabel"><a class="dv-oid" href="#5b">5b</a>Grouped by category, drag to reorder</div>
+<div class="dv-card">
+<div class="frames" style="padding:16px">
+<div>
+<div class="flabel">Desktop</div>
+<div style="width:640px;border:2px solid var(--color-text)">
+<div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<div class="abar"><span class="abrand">Zeeli Admin</span><span style="display:flex;gap:14px;align-items:baseline"><span class="atab on">Menu</span><span class="atab">Orders</span><span class="atab">Sign out</span></span></div>
+<div style="display:flex">
+<div style="width:150px;border-right:2px solid var(--color-text);padding:12px 10px;display:flex;flex-direction:column;gap:9px">
+<span style="font:700 8px var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--color-neutral-600)">Categories</span>
+<span style="font:700 9.5px var(--font-body);color:var(--color-accent-700);border-bottom:2px solid var(--color-accent);padding-bottom:3px">Small Chops 3</span>
+<span style="font:700 9.5px var(--font-body);color:var(--color-neutral-600)">Grills 2</span>
+<span style="font:700 9.5px var(--font-body);color:var(--color-neutral-600)">Platters/Trays 2</span>
+<span style="font:700 9.5px var(--font-body);color:var(--color-neutral-600)">Drinks 2</span>
+<span class="btns" style="margin-top:4px;text-align:center">+ Category</span>
+</div>
+<div style="flex:1;padding:12px">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px"><span style="font:800 13px var(--font-heading);text-transform:uppercase">Small Chops</span><span class="btnp">+ New item</span></div>
+<div style="display:flex;flex-direction:column;gap:0">
+<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--color-neutral-300)"><span style="font:700 11px var(--font-body);color:var(--color-neutral-400);cursor:grab">⠿</span><span class="ph" style="width:26px;height:26px">Img</span><span style="flex:1;font:700 9.5px var(--font-body)">Puff Puff (6pc)</span><span style="font:700 9.5px var(--font-body)">₦800</span><span class="sw"></span><span style="font:700 9px var(--font-body);color:var(--color-accent-700)">Edit</span></div>
+<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--color-neutral-300)"><span style="font:700 11px var(--font-body);color:var(--color-neutral-400);cursor:grab">⠿</span><span class="ph" style="width:26px;height:26px">Img</span><span style="flex:1;font:700 9.5px var(--font-body)">Chicken Samosa</span><span style="font:700 9.5px var(--font-body)">₦1,200</span><span class="sw"></span><span style="font:700 9px var(--font-body);color:var(--color-accent-700)">Edit</span></div>
+<div style="display:flex;align-items:center;gap:8px;padding:7px 0"><span style="font:700 11px var(--font-body);color:var(--color-neutral-400);cursor:grab">⠿</span><span class="ph" style="width:26px;height:26px">Img</span><span style="flex:1;font:700 9.5px var(--font-body)">Spring Rolls</span><span style="font:700 9.5px var(--font-body)">₦1,000</span><span class="sw"></span><span style="font:700 9px var(--font-body);color:var(--color-accent-700)">Edit</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="5c">
+<div class="dv-olabel"><a class="dv-oid" href="#5c">5c</a>Card grid, photo-forward</div>
+<div class="dv-card">
+<div class="frames" style="padding:16px">
+<div>
+<div class="flabel">Desktop</div>
+<div style="width:640px;border:2px solid var(--color-text)">
+<div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<div class="abar"><span class="abrand">Zeeli Admin</span><span style="display:flex;gap:14px;align-items:baseline"><span class="atab on">Menu</span><span class="atab">Orders</span><span class="atab">Sign out</span></span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:2px solid var(--color-text)"><span style="font:800 14px var(--font-heading);text-transform:uppercase">Menu items</span><span class="btnp">+ New item</span></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:12px">
+<div style="display:flex;flex-direction:column;gap:4px"><div class="ph" style="height:64px">Photo</div><span style="font:700 9.5px var(--font-body)">Puff Puff (6pc)</span><span style="font:700 9.5px var(--font-body);color:var(--color-accent-700)">₦800</span><span style="display:flex;align-items:center;justify-content:space-between"><span class="sw"></span><span style="font:700 8.5px var(--font-body);color:var(--color-accent-700)">Edit</span></span></div>
+<div style="display:flex;flex-direction:column;gap:4px"><div class="ph" style="height:64px">Photo</div><span style="font:700 9.5px var(--font-body)">Chicken Samosa</span><span style="font:700 9.5px var(--font-body);color:var(--color-accent-700)">₦1,200</span><span style="display:flex;align-items:center;justify-content:space-between"><span class="sw"></span><span style="font:700 8.5px var(--font-body);color:var(--color-accent-700)">Edit</span></span></div>
+<div style="display:flex;flex-direction:column;gap:4px"><div class="ph" style="height:64px">Photo</div><span style="font:700 9.5px var(--font-body)">Combo Tray <span class="tagn">3 sizes</span></span><span style="font:700 9.5px var(--font-body);color:var(--color-accent-700)">From ₦3,500</span><span style="display:flex;align-items:center;justify-content:space-between"><span class="sw"></span><span style="font:700 8.5px var(--font-body);color:var(--color-accent-700)">Edit</span></span></div>
+<div style="display:flex;flex-direction:column;gap:4px;opacity:.55"><div class="ph" style="height:64px">Photo</div><span style="font:700 9.5px var(--font-body)">Chapman</span><span style="font:700 9.5px var(--font-body);color:var(--color-accent-700)">₦1,500</span><span style="display:flex;align-items:center;justify-content:space-between"><span class="sw off"></span><span style="font:700 8.5px var(--font-body);color:var(--color-accent-700)">Edit</span></span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "put <a class="dv-oid" href="#5b">5b</a>'s category sidebar beside <a class="dv-oid" href="#5a">5a</a>'s table" · "show the empty state before any item exists" · "new directions"</p>
+</section>
+
+<section class="dv-turn" id="t6">
+<div class="dv-thd"><a class="dv-tid" href="#t6">6</a><span class="dv-tname">Item editor — photo, price, variants</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="6a">
+<div class="dv-olabel"><a class="dv-oid" href="#6a">6a</a>Side drawer over the list, variant repeater</div>
+<div class="dv-card">
+<div class="frames" style="padding:16px">
+<div>
+<div class="flabel">Desktop</div>
+<div style="width:640px;height:400px;border:2px solid var(--color-text);position:relative;overflow:hidden;background:var(--color-bg)">
+<div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<div style="opacity:.3">
+<div class="abar"><span class="abrand">Zeeli Admin</span><span class="atab on">Menu</span></div>
+<div style="padding:10px 12px"><div class="ph" style="height:22px;margin-bottom:6px">Row</div><div class="ph" style="height:22px;margin-bottom:6px">Row</div><div class="ph" style="height:22px">Row</div></div>
+</div>
+<div style="position:absolute;right:0;top:22px;bottom:0;width:290px;border-left:2px solid var(--color-text);background:var(--color-bg);padding:14px;display:flex;flex-direction:column;gap:9px;overflow:auto">
+<div style="display:flex;align-items:center;justify-content:space-between"><span style="font:800 12px var(--font-heading);text-transform:uppercase">Edit item</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></div>
+<div style="height:2px;background:var(--color-text)"></div>
+<div style="display:flex;gap:9px;align-items:flex-start"><div class="ph" style="width:64px;height:52px;flex:none">Photo</div><div style="flex:1;display:flex;flex-direction:column;gap:4px"><span class="btns" style="text-align:center">Replace photo</span><span style="font:400 7.5px var(--font-body);color:var(--color-neutral-600)">JPG or PNG, max 2MB</span></div></div>
+<div class="fld"><span class="flab">Name</span><span class="fval">Small Chops Combo Tray</span></div>
+<div class="fld"><span class="flab">Category</span><span class="fval">Platters/Trays ▾</span></div>
+<div class="fld"><span class="flab">Description</span><span class="fval" style="min-height:26px">Mixed tray — puff puff, samosa…</span></div>
+<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-top:1px solid var(--color-neutral-300);border-bottom:1px solid var(--color-neutral-300)"><span class="sw"></span><span style="font:700 9px var(--font-body)">Sells in sizes</span></div>
+<div style="display:flex;flex-direction:column;gap:5px">
+<span class="flab">Sizes</span>
+<div style="display:flex;gap:5px;align-items:center"><span class="fval" style="flex:1">Tray of 20</span><span class="fval" style="width:62px">₦3,500</span><span style="font:700 11px var(--font-body);color:var(--color-neutral-500)">×</span></div>
+<div style="display:flex;gap:5px;align-items:center"><span class="fval" style="flex:1">Tray of 50</span><span class="fval" style="width:62px">₦7,000</span><span style="font:700 11px var(--font-body);color:var(--color-neutral-500)">×</span></div>
+<div style="display:flex;gap:5px;align-items:center"><span class="fval" style="flex:1">Tray of 100</span><span class="fval" style="width:62px">₦12,000</span><span style="font:700 11px var(--font-body);color:var(--color-neutral-500)">×</span></div>
+<span class="btns" style="text-align:center">+ Add size</span>
+</div>
+<div style="display:flex;gap:7px;margin-top:2px"><span class="btnp" style="flex:1">Save</span><span class="btns" style="flex:1;text-align:center">Cancel</span></div>
+<span style="font:700 8.5px var(--font-body);color:var(--color-accent-700);text-align:left">Delete item</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="6b">
+<div class="dv-olabel"><a class="dv-oid" href="#6b">6b</a>Full page, two columns, base price disabled by sizes</div>
+<div class="dv-card">
+<div class="frames" style="padding:16px">
+<div>
+<div class="flabel">Desktop</div>
+<div style="width:640px;border:2px solid var(--color-text)">
+<div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<div class="abar"><span class="abrand">Zeeli Admin</span><span style="display:flex;gap:14px;align-items:baseline"><span class="atab on">Menu</span><span class="atab">Orders</span></span></div>
+<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:2px solid var(--color-text)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg><span style="font:800 12px var(--font-heading);text-transform:uppercase">New item</span></div>
+<div style="display:flex;gap:16px;padding:14px">
+<div style="flex:1;display:flex;flex-direction:column;gap:9px">
+<div class="fld"><span class="flab">Name</span><span class="fbox">e.g. Chicken Samosa</span></div>
+<div class="fld"><span class="flab">Category</span><span class="fval">Small Chops ▾</span></div>
+<div class="fld"><span class="flab">Description</span><span class="fbox" style="min-height:30px">Short line shown under the name</span></div>
+<div style="display:flex;align-items:center;gap:7px"><span class="sw off"></span><span style="font:700 9px var(--font-body)">Sells in sizes</span></div>
+<div class="fld"><span class="flab">Price</span><span class="fbox">₦0</span></div>
+</div>
+<div style="width:210px;display:flex;flex-direction:column;gap:9px;border-left:2px solid var(--color-text);padding-left:16px">
+<span class="flab">Photo</span>
+<div class="ph" style="height:96px">Drop a photo, or browse</div>
+<span style="font:400 7.5px var(--font-body);color:var(--color-neutral-600)">JPG or PNG, max 2MB. Shown to customers at 4:3.</span>
+<div style="display:flex;align-items:center;gap:7px;padding-top:8px;border-top:1px solid var(--color-neutral-300)"><span class="sw"></span><span style="font:700 9px var(--font-body)">Available to order</span></div>
+<div style="display:flex;gap:7px;margin-top:auto"><span class="btnp" style="flex:1">Save item</span><span class="btns" style="flex:1;text-align:center">Cancel</span></div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="flabel">Mobile</div>
+<div style="width:280px;border:2px solid var(--color-text)">
+<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:2px solid var(--color-text)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg><span style="font:800 11px var(--font-heading);text-transform:uppercase">New item</span></div>
+<div style="padding:10px;display:flex;flex-direction:column;gap:9px">
+<div class="ph" style="height:60px">Drop a photo, or browse</div>
+<div class="fld"><span class="flab">Name</span><span class="fbox">e.g. Chicken Samosa</span></div>
+<div class="fld"><span class="flab">Category</span><span class="fval">Small Chops ▾</span></div>
+<div class="fld"><span class="flab">Price</span><span class="fbox">₦0</span></div>
+<div style="display:flex;align-items:center;gap:7px"><span class="sw"></span><span style="font:700 9px var(--font-body)">Available to order</span></div>
+<span class="btnp">Save item</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="6c">
+<div class="dv-olabel"><a class="dv-oid" href="#6c">6c</a>Modal, sizes as a sub-table with unsaved-changes bar</div>
+<div class="dv-card">
+<div class="frames" style="padding:16px">
+<div>
+<div class="flabel">Desktop</div>
+<div style="width:640px;height:400px;border:2px solid var(--color-text);position:relative;overflow:hidden;background:var(--color-bg)">
+<div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<div style="opacity:.3">
+<div class="abar"><span class="abrand">Zeeli Admin</span><span class="atab on">Menu</span></div>
+<div style="padding:10px 12px"><div class="ph" style="height:22px;margin-bottom:6px">Row</div><div class="ph" style="height:22px">Row</div></div>
+</div>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;border:2px solid var(--color-text);background:var(--color-bg);display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:2px solid var(--color-text)"><span style="font:800 12px var(--font-heading);text-transform:uppercase">Edit — Grill Platter</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></div>
+<div style="padding:12px;display:flex;flex-direction:column;gap:9px">
+<div style="display:flex;gap:10px"><div class="fld" style="flex:1"><span class="flab">Name</span><span class="fval">Grill Platter</span></div><div class="fld" style="width:120px"><span class="flab">Category</span><span class="fval">Trays ▾</span></div></div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<span class="flab">Sizes</span>
+<table style="width:100%;border-collapse:collapse">
+<tr><th class="th">Label</th><th class="th" style="text-align:right">Price</th><th class="th" style="text-align:center">On</th><th class="th"></th></tr>
+<tr><td class="td">Small</td><td class="td" style="text-align:right">₦9,000</td><td class="td" style="text-align:center"><span class="sw"></span></td><td class="td" style="text-align:right;color:var(--color-neutral-500)">×</td></tr>
+<tr><td class="td">Large</td><td class="td" style="text-align:right">₦16,000</td><td class="td" style="text-align:center"><span class="sw"></span></td><td class="td" style="text-align:right;color:var(--color-neutral-500)">×</td></tr>
+</table>
+<span class="btns" style="align-self:flex-start;margin-top:4px">+ Add size</span>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-top:2px solid var(--color-text);background:var(--color-accent-100)">
+<span style="font:700 8.5px var(--font-body);color:var(--color-accent-800);text-transform:uppercase;letter-spacing:.04em">Unsaved changes</span>
+<span style="display:flex;gap:7px"><span class="btns">Discard</span><span class="btnp">Save</span></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "wireframe the admin orders dashboard" · "show <a class="dv-oid" href="#6a">6a</a>'s upload progress and failure states" · "new directions"</p>
+</section>
+
+</x-dc>
+</body>
+</html>
