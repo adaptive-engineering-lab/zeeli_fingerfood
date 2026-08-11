@@ -98,6 +98,34 @@ flash of the sign-in form on every reload would make FR-005's persistent session
 stranger lands in, and it MUST render the sign-in screen rather than an error that confirms the
 account exists.
 
+### Where `'admin'` vs `'not-admin'` comes from
+
+`admins` has **no client read policy** (§1), so the browser cannot answer this by querying the table
+— a `select` against it returns zero rows for the vendor and for a stranger alike, which is
+indistinguishable from "not an admin" and would lock the vendor out of their own product.
+
+**Contract**: the hook resolves the distinction by calling `is_admin()` directly:
+
+```text
+const { data, error } = await supabase.rpc('is_admin')
+// data === true  → 'admin'
+// data === false → 'not-admin'
+// error          → 'not-admin' (fail closed)
+```
+
+This is what the `grant execute to anon, authenticated` in §1 is for — the function is already the
+project's single answer to "is this session the vendor?", and reusing it means the UI and the nine
+policies cannot drift apart. It leaks nothing: it answers only about the caller, never about who
+else holds an account (FR-003, FR-037).
+
+Three properties this relies on, all of which §1 already provides:
+
+- **`security definer`** — it reads `admins` despite that table's lockdown.
+- **`auth.uid()`** — it is scoped to the caller, so an anonymous visitor gets `false`, not an error.
+- **Fail closed** — a network or permission error resolves to `'not-admin'`, never `'admin'`. This
+  is a UI convenience only; the actual guarantee is the policy, which is evaluated server-side on
+  every write regardless of what the client believes.
+
 ---
 
 ## Ordering requirement

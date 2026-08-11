@@ -77,11 +77,18 @@ Gates from [.specify/memory/constitution.md](../../.specify/memory/constitution.
 | I | Test-First for Decidable Logic | Item validation, sort-order computation, image target sizing and storage-path derivation are pure and get failing tests first | ✅ PASS | ✅ PASS — four pure modules specified in [contracts/](./contracts/), each with its cases fixed before code |
 | II | The Order Always Reaches the Vendor | No admin action may stop a customer ordering | ⚠️ **AT RISK** — discard breaks the `place_order` FK insert | ✅ PASS — resolved by nulling unknown catalogue ids in `place_order` (research D9); verified by quickstart scenario 7 |
 | III | Design System Fidelity | Follow the wireframes and Modernist; `npm run lint` enforces tokens across the new admin CSS | ✅ PASS | ✅ PASS — options 4c / 5b / 6a chosen with reasons in research D1 |
-| IV | Mobile-First Performance Budget | Customer route stays under 150 KB gzipped | ⚠️ **AT RISK** — an admin area could easily add 30 KB+ | ✅ PASS — admin lazy-loaded behind `React.lazy`, zero new runtime dependencies; quickstart scenario 8 measures the customer chunk specifically, not the total |
+| IV | Mobile-First Performance Budget | **Three** clauses: 150 KB gzipped customer JS; Lighthouse mobile ≥ 90 and FCP < 1.5s on 4G; **photographs served responsively and lazy-loaded** | ⚠️ **AT RISK** — an admin area could easily add 30 KB+, and vendor uploads replace curated seed images on the customer path | ✅ PASS — admin lazy-loaded, zero new runtime dependencies; **two stored derivatives + responsive serving** (research D5, FR-035/FR-036); quickstart scenario 8 measures the customer chunk, Lighthouse and FCP, not just bytes |
 | V | Least-Privilege Data | RLS policied; only the admin writes catalogue data | ❌ **FAIL as it stands** — `auth.role() = 'authenticated'` grants any signed-in user full admin, including reading all customer PII | ✅ PASS — replaced by an `admins` allow-list predicate; self-signup disabled; verified by an extended permissions script |
 
 **Result**: two gates were at risk and one failed on entry. All three are resolved by design rather
 than waived — see Complexity Tracking for the two additions that cost.
+
+**Correction (2026-08-11, post-analysis)**: the Principle IV row above originally read only the
+150 KB clause and was marked PASS without assessing the principle's other two. That was a gate
+marked green on a third of its content. Re-evaluated in full: the photograph clause drove the
+two-derivative decision in research D5, and the Lighthouse/FCP thresholds are now measured in
+quickstart scenario 8 rather than assumed. This feature is the first to put vendor-supplied images
+on the customer path, so those numbers can genuinely move.
 
 ## Project Structure
 

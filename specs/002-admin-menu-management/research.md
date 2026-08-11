@@ -120,8 +120,18 @@ client — enforces it.
 
 ## D5: reducing photos on the device
 
-**Decision**: `createImageBitmap(file)` → draw to `<canvas>` at a target long edge of **1600px** →
-`canvas.toBlob(type, 0.82)`, preferring `image/webp` and falling back to `image/jpeg`. No library.
+**Decision**: `createImageBitmap(file)` → draw to `<canvas>` → `canvas.toBlob(type, 0.82)`,
+preferring `image/webp` and falling back to `image/jpeg`. No library. **Two derivatives per photo**,
+from the same decoded bitmap: a **card** size (long edge 800px) and a **detail** size (1600px).
+
+**Amended 2026-08-11 after analysis.** The original decision stored a single 1600px derivative. That
+missed a clause of constitution Principle IV — "item photographs MUST be served responsively and
+lazy-loaded below the fold" — which the plan's gate had marked PASS while only reading the 150 KB
+clause. A single derivative cannot be served responsively; there is nothing to choose between. The
+customer menu renders cards roughly 150–300px wide on a phone, so serving 1600px there wastes most
+of the bytes SC-006 is trying to save. Two sizes cost one extra canvas pass and one extra upload,
+both on the vendor's device, and are emitted with `srcset`/`sizes` (FR-035). Lazy loading is already
+in place on `MenuItemCard` and simply needs to stay (FR-036).
 
 **Rationale**: both APIs are native in every browser this project targets, so the cost to the bundle
 is a few hundred bytes of our own code rather than 10–40 KB of dependency — and Principle IV has
@@ -233,6 +243,68 @@ Per Principle I, the decidable logic is extracted and tested before implementati
 Excluded deliberately: the canvas call, the Supabase calls and the components. They are exercised in
 the browser and by the permissions script, where a failure means something real — rather than mocked
 into a test that passes whatever the code does.
+
+## D11: what customers see when the catalogue is legitimately empty
+
+**Added 2026-08-11 after analysis.** `src/features/menu/useMenu.js:85` currently reads:
+
+```js
+if (menu.items.length === 0) { showSeedMenu(); return }
+```
+
+The read **succeeded** and returned zero rows, and the app shows the developer's seeded sample menu.
+Today the catalogue holds nine rows so it never fires. The moment this feature ships and the vendor
+clears the placeholder menu to enter their own, **customers get the placeholder menu back** — sample
+items at prices nobody confirmed, orderable, with a small "sample menu" note. That is precisely the
+outcome this feature exists to abolish, and it contradicts FR-033.
+
+**Decision**: separate the two situations. The seed fallback fires **only** when the catalogue could
+not be read — unconfigured client, network failure, query error. A successful read of zero rows is an
+empty menu and renders the empty state (FR-034, SC-014).
+
+**Rationale**: constitution Principle II requires a degraded path when a dependency *fails*. Zero
+rows is not a failure; it is an answer. Applying the fallback to a successful read isn't Principle II,
+it is a bug wearing its clothes — and the failure mode is showing customers wrong prices, which is
+worse than showing them nothing.
+
+**Alternative rejected**: keep the fallback and rely on the vendor never emptying the menu. They will
+— clearing the seeded catalogue is exactly how they start (SC-008).
+
+---
+
+## D12: enforcing the catalogue rules in the database
+
+**Added 2026-08-11 after analysis**, which found `data-model.md` claiming five `check` constraints
+and a database-level category guard, none of which are tasked. Checking the live schema showed the
+situation is worse than "not tasked":
+
+| Claimed | Actually in the database |
+|---|---|
+| 5 `check` constraints on `menu_items` / `menu_item_variants` | **Zero.** `contype = 'c'` returns nothing for either table |
+| Category removal blocked while items remain | **The opposite.** `menu_items_category_id_fkey` is `ON DELETE SET NULL` |
+
+That FK is the sharper problem. Deleting a populated category does not fail — it silently sets
+`category_id = null` on every item in it. Those items keep `is_available = true` and
+`removed_at is null`, so they are "live" but belong to no category, and the customer menu renders by
+category. They would vanish from the menu while every admin view still calls them available. That is
+data loss in effect, without an error anywhere.
+
+**Decision**: a fourth migration adds the check constraints and replaces the silent-orphan behaviour
+with a `before delete` trigger on `categories` that raises when any **live** (`removed_at is null`)
+item still references it — matching FR-030, which explicitly excludes already-removed items.
+
+**Rationale**: SC-007 promises zero invalid items reach customers. Client-side validation cannot
+promise that, because an admin session holds a real API key and can write directly. The client rules
+are for the vendor's benefit; the constraints are the guarantee. This is the same reasoning that put
+`place_order` in the database in feature 001.
+
+**Why a trigger rather than `on delete restrict`**: `restrict` would block deleting a category that
+holds only *removed* items, which FR-030 says must be allowed. The predicate needs a `where` clause,
+so it needs a trigger.
+
+**Alternative rejected**: correct `data-model.md` to say "client-only" and soften SC-007. Honest, but
+it leaves a live FK that silently orphans items — that has to be fixed regardless of where validation
+lives.
 
 ## Resolved unknowns
 

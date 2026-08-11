@@ -136,7 +136,10 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
 - **A device that cannot reduce the photo.** The vendor is told, rather than a multi-megabyte original being uploaded silently on their behalf.
 - **Signing out, or the session expiring, with unsaved edits.** The vendor is told their changes weren't saved rather than losing them silently.
 - **The vendor's own device goes offline mid-save.** They are told the change didn't save; no partial item is created.
-- **The last category is removed, or every item is switched off.** The customer menu shows a clear empty state, not an error.
+- **The last category is removed, or every item is switched off.** The customer menu shows a clear
+  empty state, not an error — and specifically **not** the seeded sample menu. An empty menu the
+  vendor created deliberately must not be papered over with developer placeholder items at
+  unconfirmed prices, which is the very thing this feature exists to abolish (FR-034).
 - **Two browser tabs editing the same item.** The last save wins; this is a single-admin product and the risk is accepted.
 - **The sign-in link doesn't arrive.** The vendor can request another without waiting out a
   cooldown they weren't told about, and the screen says plainly where the link was sent and to check
@@ -159,6 +162,10 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
 
 ### Functional Requirements
 
+> Numbering is **append-only** from 2026-08-11, when planning began citing these identifiers.
+> FR-034 onward were added after the first analysis pass and sit with their topic rather than at the
+> end of the list, so existing references stay valid.
+
 **Access**
 
 - **FR-001**: The system MUST let the vendor sign in by entering their email address and opening a
@@ -177,6 +184,10 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
   a first sign-in, a new device, an explicit sign-out, or a lapsed session. Everyday menu edits from
   the vendor's own phone MUST NOT require one.
 - **FR-007**: Only the signed-in vendor MUST be able to create, change or remove categories, items or sizes. The anonymous public MUST keep read access to available items only, and no write access of any kind.
+- **FR-037**: The system MUST be able to tell a signed-in vendor from someone who merely holds a
+  session, and MUST show the latter the sign-in screen rather than a management screen that fails to
+  load or an error confirming an account exists. Being signed in and being the vendor are different
+  questions and MUST be answered separately.
 
 **Menu items**
 
@@ -207,6 +218,10 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
 - **FR-021**: If a device cannot reduce the photo, the vendor MUST be told plainly rather than
   having a multi-megabyte original uploaded silently on their behalf.
 - **FR-022**: Replacing an item's photo MUST release the photo it replaced, for the same reason as FR-017.
+- **FR-035**: Each photo MUST be stored at **more than one size**, and customers' browsers MUST be
+  given enough information to download the size that suits the space the photo occupies rather than
+  always the largest. A phone showing a photo two inches wide must not pay for a display-sized image.
+- **FR-036**: Photos below the fold MUST NOT be downloaded until they are needed.
 
 **Sizes**
 
@@ -227,6 +242,10 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
 - **FR-031**: Catalogue changes MUST NOT interrupt a customer's in-progress session: their cart survives, and checkout still records the order and still opens WhatsApp.
 - **FR-032**: A customer MUST never see a partially saved item.
 - **FR-033**: The customer menu MUST show a clear empty state, not an error, when no items are available.
+- **FR-034**: An empty catalogue and an unreachable one MUST be treated as different situations. When
+  the catalogue is reachable and legitimately empty — because the vendor removed or switched off
+  everything — customers MUST see the empty state and MUST NOT be shown sample data. Falling back to
+  placeholder items is reserved for the case where the catalogue could not be read at all.
 
 ### Key Entities
 
@@ -253,6 +272,9 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
 - **SC-010**: Across a week of daily use from the vendor's usual phone, they are asked for a sign-in link **at most once**. Email is not part of a routine visit.
 - **SC-011**: A vendor who removes the wrong item restores it, complete, in **under 30 seconds** and without help. **0** items are lost irrecoverably within the retention window, across a test pass that deliberately removes and restores each kind of item, including one with sizes and a photo.
 - **SC-012**: Removed items and replaced photos leave **no** orphaned storage behind once discarded — measured by comparing stored photos against live items after a pass of removals, restores, discards and photo replacements.
+- **SC-013**: A customer loading the menu on a phone downloads **card-sized** photos, not
+  display-sized ones — verified by inspecting transferred bytes per image against the rendered size.
+- **SC-014**: With the catalogue reachable and empty, **0** placeholder items appear to customers.
 
 ## Assumptions
 
@@ -273,8 +295,10 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
 - **Photo reduction happens on the vendor's device**, which puts image-handling weight in the admin
   experience. That weight MUST NOT reach the customer-facing route, whose budget is fixed by
   constitution Principle IV and currently sits at 132.86 KB of its 150 KB.
-- **The original photo is not kept.** What the vendor uploads is what is stored; there is no
-  full-resolution archive to re-derive other sizes from later.
+- **The original photo is not kept, but two derivatives are.** The camera original is discarded on
+  the device. Two sizes are stored — one sized for a menu card, one for the item detail view — so
+  photos can be served responsively (FR-035) without keeping a full-resolution archive. Adding a
+  third size later means re-uploading, which is accepted: the vendor has the original on their phone.
 - **Sort order is the vendor's, not automatic.** Categories and items appear in the order the vendor sets by dragging, not alphabetically or by popularity. A newly added item goes last in its category until moved.
 - **Availability is a switch, not a count.** No stock quantities to keep in step (PRD §6.0).
 - **Concurrency is not a real risk.** One admin means simultaneous conflicting edits are vanishingly unlikely; last-write-wins is accepted.

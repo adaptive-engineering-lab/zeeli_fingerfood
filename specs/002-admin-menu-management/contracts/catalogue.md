@@ -64,20 +64,30 @@ changedRows(before, after)        → [{ id, sort_order }]  // only rows whose o
 ## 3. `imageResize.js`
 
 ```text
-targetSize({ width, height }, maxEdge) → { width, height }   // pure
-reduceImage(file, options)             → Promise<Blob>       // thin wrapper over canvas
+targetSize({ width, height }, maxEdge) → { width, height }        // pure
+reduceImage(file)  → Promise<{ card: Blob, detail: Blob, type }>  // thin wrapper over canvas
 ```
 
 **`targetSize` contract** — the pure part, tested first:
 
-- Scales so the **long** edge equals `maxEdge` (default 1600), preserving aspect ratio.
+- Scales so the **long** edge equals `maxEdge`, preserving aspect ratio.
 - **Never upscales**: an image already within `maxEdge` is returned unchanged.
 - Rounds to whole pixels; never returns a zero dimension.
 
-**`reduceImage` contract**: `createImageBitmap` → canvas → `toBlob`, preferring `image/webp` and
-falling back to `image/jpeg` at quality 0.82. **Rejects** when the file is not an image (FR-019) or
-when the browser cannot do the work (FR-021) — it MUST NOT fall back to uploading the original.
-Exercised in a browser, not mocked.
+**`reduceImage` contract**: decode once with `createImageBitmap`, then draw twice — a **card**
+derivative at long edge **800** and a **detail** derivative at **1600** — and `toBlob` each,
+preferring `image/webp` and falling back to `image/jpeg` at quality 0.82.
+
+Two sizes, not one, because constitution Principle IV requires photographs to be *served
+responsively*, and one stored size gives the browser nothing to choose between (FR-035,
+[research D5](../research.md#d5-reducing-photos-on-the-device)). Cards render 150–300px wide on a
+phone; sending 1600px there wastes most of the bytes SC-006 is trying to save.
+
+**Rejects** when the file is not an image (FR-019) or when the browser cannot do the work (FR-021) —
+it MUST NOT fall back to uploading the original. Exercised in a browser, not mocked.
+
+**Type check contract (FR-019)**: reject on MIME type *and* on `createImageBitmap` throwing. A file
+renamed `.jpg` is not an image, and only the decode attempt proves it.
 
 ### Test cases (`targetSize`)
 
@@ -92,29 +102,74 @@ Exercised in a browser, not mocked.
 ## 4. `storagePaths.js` — pure
 
 ```text
-photoPath(itemId, extension) → 'menu/{itemId}/{random}.{ext}'
-itemPrefix(itemId)           → 'menu/{itemId}/'
+photoPaths(itemId, extension) → { card, detail, stem }
+  // 'menu/{itemId}/{random}-card.{ext}', 'menu/{itemId}/{random}-detail.{ext}'
+itemPrefix(itemId)            → 'menu/{itemId}/'
 ```
 
-**Contract**: item-scoped so discarding clears a prefix in one call (FR-017), and a fresh random
-filename per upload so a replacement never collides with a cached URL.
+**Contract**: item-scoped so discarding clears a prefix in one call (FR-017). Both derivatives share
+one random stem, so a replacement releases the pair together (FR-022) and neither collides with a
+cached URL.
 
 ### Test cases
 
-1. Path starts with the item prefix.
-2. Two calls for one item differ.
-3. Extension is honoured; no double dots.
+1. Both paths start with the item prefix.
+2. Card and detail share a stem and differ only by suffix.
+3. Two calls for one item produce different stems.
+4. Extension is honoured on both; no double dots.
 
 ---
 
-## 5. Write operations
+## 5. `save_menu_item` — the one write that cannot be two calls
+
+Everything else in §6 is a single statement and can be a straight `supabase` call. Saving an item
+that sells in sizes cannot: it writes `menu_items` **and** replaces that item's `menu_item_variants`,
+and from the client those are two round trips with no transaction around them.
+
+A failure between them is not hypothetical bookkeeping — it is FR-032 breaking in the way that
+matters most. Switch an item to sizes-mode, clear its base price, and lose the connection before the
+sizes land, and customers see an item with **no price at all** that is still `is_available`. SC-007
+promises zero invalid items reach customers; two client calls cannot promise it.
+
+```text
+save_menu_item(
+  p_id uuid,                -- null to create
+  p_name text, p_category_id uuid, p_description text,
+  p_price numeric,          -- null when selling in sizes
+  p_is_available boolean,
+  p_image_url text, p_image_card_url text,
+  p_sizes jsonb             -- [] when not selling in sizes
+) → uuid                    -- the item id
+
+  volatile, security definer, set search_path = public, pg_temp
+```
+
+**Contract**:
+
+- **Re-checks `is_admin()` in its own body and raises otherwise.** `security definer` bypasses RLS,
+  so the policy that protects the tables does **not** protect this function. Feature 001 learned this
+  with `place_order`; the same rule applies here and for the same reason.
+- Insert-or-update the item, then reconcile its sizes to `p_sizes` — update those that persist,
+  insert those that are new, delete those absent — all in the one implicit transaction.
+- Deleting a size that a past order references MUST NOT cascade into that order. Retire preserves
+  history; the FK behaviour here must be verified, not assumed (see [D9](../research.md#d9-discard-vs-a-customers-in-flight-order)).
+- Enforces the same rules as `validateItem`, since a session holds a real API key and can call this
+  function directly, bypassing any form. The client rule is for the vendor; this is the guarantee.
+- Returns the item id so a create can immediately attach photos under `menu/{itemId}/`.
+
+`validateItem` still runs first in the browser — the vendor gets all their errors at once (FR-010)
+rather than the first one Postgres happens to raise.
+
+---
+
+## 6. Other write operations
 
 Straight `supabase` calls, gated by `is_admin()`. Listed for the contract they owe, not to prescribe
 their shape.
 
 | Operation | Owes |
 |---|---|
-| create / update item | validated first; a sized item writes its sizes in the same save so the two never disagree |
+| create / update item | validated first, then written through `save_menu_item` (§5) — never as a separate item write and sizes write |
 | remove item | sets `removed_at`; **never** deletes |
 | restore item | clears `removed_at`; if its category is gone, the vendor picks a new one first (spec edge case) |
 | discard item | deletes the row, then clears its storage prefix. Row first: an orphaned object is recoverable, a photo-less row is not |

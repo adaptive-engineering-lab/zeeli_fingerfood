@@ -54,6 +54,12 @@ Extended from 001 with a second identity: a real authenticated session that is *
 
 Plus 001's nine anonymous assertions, still passing.
 
+**And the positive half**, which matters as much: as a session that **is** in `admins`, every one of
+those same operations succeeds, and `is_admin()` returns true. Denials alone prove nothing — a
+policy that refused *everyone* (a `using (false)`, a mistyped function name, a missing grant) would
+satisfy the whole table above while leaving the vendor locked out of their own product. The check
+must fail in both directions.
+
 **Then break it deliberately**: add that user to `admins`, re-run, and watch the same assertions
 fail. A permissions check that has only ever passed proves nothing — 001 established this and it
 applies here with more force.
@@ -118,6 +124,15 @@ select id from menu_items;
 Also confirm a removed item does not block removing its category (FR-030), and that a **live** one
 does, with a count.
 
+Then the state those two rules make reachable: remove an item, remove its now-empty category, and
+restore the item. **Expect**: the vendor is asked which category it should return to, and it comes
+back there. Not an error, and not an item with no category at all — which the customer menu, being
+rendered by category, would silently drop while the vendor's list called it live.
+
+Finally, interrupt a save: go offline mid-edit and save. **Expect**: a plain message that it did not
+save, with the typed-in edits still on screen. Losing a half-entered item silently is the failure
+most likely to cost the vendor's trust in the tool.
+
 ## Scenario 7 — a discard cannot cost a customer their order (SC-004, FR-031, Principle II)
 
 The regression this plan exists to prevent — see
@@ -152,6 +167,28 @@ grep -rl "features/admin" dist/assets/*.js
 
 **Expect**: only the lazy admin chunk. A stray static import silently defeats `React.lazy`, and the
 byte count alone would not catch it until it was expensive.
+
+Then the **other two** Principle IV thresholds, which the byte count does not cover — this feature is
+the first to put vendor-supplied images on the customer path:
+
+- Lighthouse mobile ≥ 90, FCP < 1.5s on a 4G profile.
+- In the network panel, a phone downloads the **card** derivative (~800px), not the detail one
+  (SC-013). If both sizes are the same bytes, `srcset` is not doing its job.
+
+## Scenario 11 — an empty catalogue shows an empty menu (SC-014, FR-034)
+
+The trap this feature would otherwise walk into on day one — the vendor's first act is to clear the
+seeded placeholder menu and enter their own.
+
+1. As the vendor, remove or switch off **every** item.
+2. Load the customer menu as an anonymous visitor.
+
+**Expect**: the empty state. **Not** the seeded sample menu — no Puff Puff, no Combo Tray, nothing
+orderable at a price nobody confirmed.
+
+Then confirm the genuine fallback still works, because it is a different situation: point
+`VITE_SUPABASE_URL` at an unreachable host and reload. **Now** the sample menu appears, with its
+"showing a sample menu" note. Read failed → seed; read succeeded and empty → empty state.
 
 ## Scenario 9 — ordering, including on a phone (SC-003, FR-028, FR-029)
 

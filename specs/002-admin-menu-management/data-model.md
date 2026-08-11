@@ -28,6 +28,25 @@ is_admin() → boolean
 `security definer` so it can read `admins` despite that table's own lockdown. `stable` so Postgres
 evaluates it once per statement rather than per row.
 
+Granted to `anon` and `authenticated`, which makes it two things at once: the predicate behind all
+nine policies, **and** the client's only way to ask whether this session is the vendor. The browser
+cannot answer that by reading `admins` — the table has no client policy, so a `select` returns zero
+rows for the vendor exactly as it does for a stranger. One function serving both means the UI and
+the policies cannot disagree about who the admin is
+([contracts/admin-auth.md](./contracts/admin-auth.md#where-admin-vs-not-admin-comes-from)).
+
+### `public.save_menu_item(...)`
+
+The second `security definer` function this feature adds, and the only catalogue write that is not a
+plain statement: it writes `menu_items` and reconciles that item's `menu_item_variants` in one
+transaction. From the browser those are two round trips, and a failure between them leaves a
+sizes-mode item with no base price and no sizes — priced at nothing, still `is_available`, in front
+of customers. Contract and signature in
+[contracts/catalogue.md](./contracts/catalogue.md#5-save_menu_item--the-one-write-that-cannot-be-two-calls).
+
+It **re-checks `is_admin()` in its own body**. `security definer` runs as the owner and bypasses
+RLS, so the nine policies do not protect it — exactly the shape of `place_order` in feature 001.
+
 ## Changed: `public.menu_items`
 
 | Field | Type | Null | Notes |
@@ -77,20 +96,51 @@ because no account exists. All nine policies move from `auth.role() = 'authentic
 Enforced in the pure modules (client) *and* by database constraints where a constraint can express
 them — the client rule is for the vendor's benefit, the constraint is the guarantee.
 
-| Rule | Where | Source |
-|---|---|---|
-| Name non-blank after trimming | client + `check` | FR-010 |
-| Category required | client + FK not-null | FR-009 |
-| Price > 0 when not selling in sizes | client + `check` | FR-010 |
-| Sizes-mode requires ≥1 size | client, then verified on save | FR-024 |
-| A sized item has no base price | client + `check` | FR-009, FR-026 |
-| Size label non-blank, price > 0 | client + `check` | FR-023 |
-| Category with live items cannot be removed | database | FR-030 |
-| Removed items excluded from customer reads | **policy**, not client | FR-016 |
-| Restorable ≥30 days | `removed_at` age | FR-017 |
+**Corrected 2026-08-11.** An earlier version of this table claimed several of these were already
+enforced by `check` constraints. They are not: `contype = 'c'` returns **zero** rows for both
+`menu_items` and `menu_item_variants`. The "Today" column below is what the live database actually
+does; "Target" is what migration `20260811d` adds.
 
-The last two are deliberately not client-side. A client-side filter is a display convention; a
-policy is a guarantee, and FR-016's whole point is that removed means invisible rather than unlisted.
+| Rule | Today | Target | Source |
+|---|---|---|---|
+| Name non-blank after trimming | nothing | client + `check` | FR-010 |
+| Category required | FK, nullable | client + `check` (not null) | FR-009 |
+| Price > 0 when not selling in sizes | nothing | client + `check` | FR-010 |
+| Sizes-mode requires ≥1 size | nothing | client, verified on save | FR-024 |
+| A sized item has no base price | nothing | client + `check` | FR-009, FR-026 |
+| Size label non-blank, price > 0 | nothing | client + `check` | FR-023 |
+| Category with live items cannot be removed | **`ON DELETE SET NULL` — silently orphans them** | `before delete` trigger | FR-030 |
+| Removed items excluded from customer reads | n/a (column doesn't exist) | **policy**, not client | FR-016 |
+| Restorable ≥30 days | n/a | `removed_at` age | FR-017 |
+
+Two notes on why the target column looks the way it does:
+
+**The category FK is the sharp edge.** `menu_items_category_id_fkey` is `ON DELETE SET NULL`, so
+deleting a populated category succeeds and leaves its items with `category_id = null` — still
+available, still not removed, but belonging to nowhere. The customer menu renders by category, so
+they would silently disappear from it while every admin view still calls them live. A trigger (not
+`on delete restrict`) is needed because FR-030 must allow deleting a category that holds only
+*removed* items, which requires a `where` clause.
+
+**Client rules are for the vendor; constraints are the guarantee.** SC-007 promises zero invalid
+items reach customers, and an admin session holds a real API key — it can write directly, bypassing
+any form. Same reasoning that put `place_order` in the database in feature 001.
+
+The removed-item exclusions are deliberately policy-level too. A client-side filter is a display
+convention; a policy is a guarantee, and FR-016's whole point is that removed means invisible rather
+than merely unlisted.
+
+## Glossary
+
+The spec speaks the customer's language; the schema and code speak the database's. They mean the
+same things:
+
+| Spec | Plan, tasks, schema |
+|---|---|
+| size | a `menu_item_variants` row — "variant" in code |
+| retire a size | `menu_item_variants.is_available = false` |
+| remove an item | `menu_items.removed_at` set |
+| discard an item | the row is deleted |
 
 ## State transitions
 
