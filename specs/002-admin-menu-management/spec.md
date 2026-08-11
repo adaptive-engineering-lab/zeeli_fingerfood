@@ -171,9 +171,15 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
 - **FR-001**: The system MUST let the vendor sign in by entering their email address and opening a
   single-use link sent to it, and MUST let them sign out. There is no password.
 - **FR-002**: The system MUST refuse access to every management screen and every catalogue write to anyone not signed in.
-- **FR-003**: Submitting any email address MUST produce the same response whether or not it belongs
-  to the vendor, so the form never reveals who holds an account. A usable link MUST only ever be
-  sent to a registered address.
+- **FR-003**: Submitting any email address MUST show the same message on screen whether or not it
+  belongs to the vendor, so the form never reveals who holds an account. A usable link MUST only
+  ever be sent to a registered address.
+  **Amended 2026-08-11 after implementation.** This originally said "the same response". It now says
+  "the same message on screen", because the stronger version is not achievable on this stack and was
+  quietly failing: requesting a link for an unregistered address returns HTTP **422** where a
+  registered one returns 200. The rejection is how the auth provider enforces "do not create an
+  account", so the enforcement *is* the disclosure. The screen is neutral; the network tab is not.
+  See the Assumptions entry for what this costs and what was rejected.
 - **FR-004**: A sign-in link MUST stop working once used and MUST expire within **15 minutes** of
   being requested, so a link sitting in an inbox is not a standing key to the account. It MUST be
   re-requestable when it expires or fails to arrive.
@@ -283,6 +289,19 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
   no reset flow to build. The obvious cost — depending on email to get in — is confined to first
   sign-in on a device: a session lasts at least 30 days and renews with use (FR-005, FR-006), so
   email is off the path of a routine visit rather than in front of every one.
+- **Account enumeration is possible, and accepted for v1.** Requesting a sign-in link returns a
+  different HTTP status for a registered address than an unregistered one (200 vs 422), so someone
+  watching the network tab can learn whether a given address holds an account. The UI does not
+  reveal it; the transport does. Three fixes were weighed:
+  *(a)* allow self-signup so every request returns 200 — rejected, it accumulates stranger accounts
+  and contradicts the project-level setting that FR-002 depends on;
+  *(b)* proxy sign-in through a server-side function that always returns 200 — rejected for v1, it
+  adds serverless infrastructure to a project that has none, to protect an address that is on the
+  vendor's public Instagram page;
+  *(c)* accept and record it — **chosen**. Knowing the address gains an attacker nothing on its own:
+  the credential is inbox access, and authorisation is the `admins` allow-list, not the address.
+  Revisit if the product ever gains a second admin, where the set of privileged addresses stops
+  being public knowledge.
 - **The vendor's inbox is the credential, and it reaches customer data.** With no password and no
   second factor, inbox access converts to an admin session, and an admin session can read every
   order — customer names, phone numbers, delivery addresses. The 15-minute single-use link bounds

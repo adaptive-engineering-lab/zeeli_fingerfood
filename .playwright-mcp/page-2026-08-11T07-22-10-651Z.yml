@@ -1,0 +1,8 @@
+- generic [ref=e12]:
+  - heading "Check your email" [level=1] [ref=e13]
+  - paragraph [ref=e15]:
+    - text: If
+    - strong [ref=e16]: definitely-not-the-vendor@example.com
+    - text: is registered, a sign-in link is on its way. It works once and expires in 15 minutes.
+  - paragraph [ref=e17]: Not arrived? Check spam, or send another.
+  - button "Send another link" [ref=e18] [cursor=pointer]

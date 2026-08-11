@@ -151,38 +151,38 @@ Sign-in UI may now be built.
 
 ### Tests first (Principle I)
 
-- [ ] T014 [P] [US1] Write failing tests in `src/features/admin/itemValidation.test.js` for the
+- [x] T014 [P] [US1] Write failing tests in `src/features/admin/itemValidation.test.js` for the
       single-price rules — blank name, missing category, price ≤ 0, and that **all** failures return
       at once rather than the first — per
       [contracts/catalogue.md](./contracts/catalogue.md#test-cases-the-implementation-must-satisfy)
 
 ### Implementation
 
-- [ ] T015 [US1] Create `src/features/admin/itemValidation.js` until T014 passes — pure, no React,
+- [x] T015 [US1] Create `src/features/admin/itemValidation.js` until T014 passes — pure, no React,
       no Supabase
-- [ ] T016 [US1] Create `src/features/admin/useAdminSession.js` exposing
+- [x] T016 [US1] Create `src/features/admin/useAdminSession.js` exposing
       `{ status: 'loading' | 'signed-out' | 'not-admin' | 'admin', email, signIn, signOut }`.
       `'loading'` MUST NOT render as signed-out, or every reload flashes the sign-in form
-- [ ] T059 [US1] Resolve `'admin'` vs `'not-admin'` in `useAdminSession.js` by calling
+- [x] T059 [US1] Resolve `'admin'` vs `'not-admin'` in `useAdminSession.js` by calling
       `supabase.rpc('is_admin')`, per
       [contracts/admin-auth.md](./contracts/admin-auth.md#where-admin-vs-not-admin-comes-from).
       **Do not query `admins`** — it has no client read policy by design, so a `select` returns zero
       rows for the vendor and for a stranger alike, which would lock the vendor out of their own
       product. Fail closed: an error resolves to `'not-admin'`, never `'admin'`. Reusing the same
       function the nine policies use is what stops the UI and the database drifting apart (FR-037)
-- [ ] T017 [US1] Create `src/features/admin/SignInPage.jsx` to **wireframe 4c**: one email field,
+- [x] T017 [US1] Create `src/features/admin/SignInPage.jsx` to **wireframe 4c**: one email field,
       flush left, with the "link sent" and error states inline. The response MUST read identically
       for registered and unregistered addresses (FR-003)
-- [ ] T018 [US1] Build the auth gate in `src/features/admin/AdminApp.jsx`: `'not-admin'` renders the
+- [x] T018 [US1] Build the auth gate in `src/features/admin/AdminApp.jsx`: `'not-admin'` renders the
       sign-in screen, never a management screen whose contents merely fail to load
-- [ ] T019 [US1] Create `src/features/admin/MenuManagerPage.jsx` to **wireframe 5b** — category
+- [x] T019 [US1] Create `src/features/admin/MenuManagerPage.jsx` to **wireframe 5b** — category
       sidebar, item rows, inline price edit and availability toggle; 5a's row treatment at phone width
-- [ ] T062 [US1] Add the sign-out control to the admin chrome, reachable from every management screen
+- [x] T062 [US1] Add the sign-out control to the admin chrome, reachable from every management screen
       and at phone width, calling `useAdminSession().signOut()`. FR-001 requires signing out and US1's
       acceptance scenario 4 tests it, but no task built it: `signOut` existed in the hook's shape with
       nothing to invoke it. After signing out, no management screen is reachable and returning asks
       for a link
-- [ ] T063 [US1] Filter the manager's main item list to `removed_at is null` (FR-015). The policy
+- [x] T063 [US1] Filter the manager's main item list to `removed_at is null` (FR-015). The policy
       hides removed items from **customers**; the vendor's own session can read them, so without an
       explicit filter every removed item reappears in the list it was removed from — and
       `RemovedItemsPanel` (T028) becomes a duplicate view rather than the only one

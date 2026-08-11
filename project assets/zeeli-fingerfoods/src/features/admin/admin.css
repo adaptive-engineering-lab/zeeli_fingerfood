@@ -1,0 +1,238 @@
+/* Admin screens — wireframes 4c (sign-in) and 5b (menu management).
+   Imported only from AdminApp.jsx, so it rides the lazy chunk and never lands
+   on the customer route (constitution Principle IV).
+
+   Modernist: no corner radius, 2px structural rules, flush-left labels, accent
+   used sparingly. Every colour and space is a token — scripts/check-design-
+   adherence.mjs enforces it. */
+
+/* Sign-in — wireframe 4c ------------------------------------------------- */
+
+.admin-signin {
+  align-items: flex-start;
+  max-width: 320px;
+}
+
+.admin-signin__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.admin-signin__rule {
+  align-self: stretch;
+  height: 2px;
+  background: var(--color-text);
+}
+
+.admin-signin__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.admin-signin__label {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-neutral-600);
+}
+
+.admin-signin__error {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--color-accent-700);
+}
+
+.admin-signin__note {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-neutral-600);
+}
+
+/* Menu management — wireframe 5b ----------------------------------------- */
+
+.admin__bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 2px solid var(--color-text);
+}
+
+.admin__brand {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.admin__nav {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.admin__tab {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--color-neutral-600);
+}
+
+.admin__tab--on {
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-accent);
+}
+
+.admin__signout {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.admin__who {
+  margin: 0;
+  padding: var(--space-2) var(--space-4) 0;
+  font-size: 11.5px;
+  color: var(--color-neutral-600);
+}
+
+.admin__layout {
+  display: flex;
+  align-items: flex-start;
+}
+
+.admin__cats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 150px;
+  padding: var(--space-3);
+  border-right: 2px solid var(--color-text);
+}
+
+.admin__catlabel {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-neutral-600);
+}
+
+.admin__cat {
+  border: 0;
+  background: none;
+  padding: 0 0 3px;
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 12.5px;
+  color: var(--color-neutral-600);
+  cursor: pointer;
+}
+
+.admin__cat[aria-current='true'] {
+  color: var(--color-accent-700);
+  border-bottom: 2px solid var(--color-accent);
+}
+
+.admin__count {
+  color: var(--color-neutral-400);
+}
+
+.admin__items {
+  flex: 1;
+  padding: var(--space-3);
+}
+
+.admin__error {
+  margin: 0 0 var(--space-2);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--color-accent-700);
+}
+
+.admin-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 7px 0;
+  border-bottom: 1px solid var(--color-neutral-300);
+}
+
+.admin-row__thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: var(--color-surface);
+  font-size: 8px;
+  color: var(--color-neutral-600);
+}
+
+.admin-row__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-row__name {
+  flex: 1;
+  font-weight: 700;
+  font-size: 12.5px;
+}
+
+.admin-row__price {
+  font-weight: 700;
+  font-size: 12.5px;
+}
+
+.admin-row__switch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  cursor: pointer;
+}
+
+.admin-row__switchlabel {
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--color-neutral-600);
+}
+
+/* Phone — 5a's row treatment: the sidebar becomes a scrolling chip row. */
+@media (max-width: 767px) {
+  .admin__layout {
+    flex-direction: column;
+  }
+
+  .admin__cats {
+    flex-direction: row;
+    gap: var(--space-3);
+    width: 100%;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 2px solid var(--color-text);
+  }
+
+  .admin__catlabel {
+    display: none;
+  }
+
+  .admin__items {
+    width: 100%;
+  }
+}
