@@ -74,9 +74,14 @@ See [research Finding 0](./research.md#finding-0-shipping-sign-in-would-open-a-p
       `storage.objects`
 - [x] T006 Apply migration `20260811a` and verify: nine policies now reference `is_admin()`, zero
       still reference `auth.role()`, and `admins` is unreadable by `anon`
-- [ ] T007 In the Supabase dashboard: **disable self-signup**, set magic-link/OTP validity to
+- [x] T007 In the Supabase dashboard: **disable self-signup**, set magic-link/OTP validity to
       **15 minutes**, and confirm the refresh-token lifetime outlasts **30 days** (FR-004, FR-005).
-      None of these are expressible as a migration and all three are load-bearing
+      None of these are expressible as a migration and all three are load-bearing.
+      **Status 2026-08-11**: self-signup disabled and *probe-verified* — `signUp()` and
+      `signInWithOtp({shouldCreateUser:true})` both return `422 Signups not allowed for this
+      instance`. Session timeouts confirmed `0`/`0` (never), so FR-005 holds by default; they are
+      Pro-gated on this plan and cannot drift. Email OTP expiration set to **900** (FR-004).
+      All three parts complete
 - [ ] T008 Create the vendor's auth user, then `insert into public.admins` selecting its id — the
       only row this feature adds
 

@@ -19,11 +19,26 @@ Applied to the target project, **in this order**:
 2. `supabase/migrations/20260811b__soft_removal.sql` — `removed_at`, narrowed public read
 3. `supabase/migrations/20260811c__place_order_fk_guard.sql` — the 001 fix
 
-Then, in the Supabase dashboard — neither is expressible as a migration, and both are load-bearing:
+Then, in the Supabase dashboard — none of these is expressible as a migration, and all are
+load-bearing. Verified on 2026-08-11:
 
-- **Disable self-signup.** Without it, a stranger can mint an account (research D2).
-- **Set the magic-link/OTP validity to 15 minutes** (FR-004; the default is 60).
-- **Confirm the refresh-token lifetime outlasts 30 days** (FR-005, SC-010).
+- **Disable self-signup** — *done*. Without it a stranger can mint an account (research D2). Confirmed
+  by probe, not by reading the toggle: both `signUp()` **and**
+  `signInWithOtp({ shouldCreateUser: true })` now return `422 Signups not allowed for this instance`.
+  The second is the one that matters — the `shouldCreateUser: false` in our client is
+  client-supplied and a crafted request can drop it, so the project setting is the actual control.
+- **Email OTP expiration set to 900 seconds** — *done* (FR-004; the default is 3600). With no password and no
+  second factor the vendor's inbox *is* the credential, and this is how long a link left sitting in
+  it stays a working key to every customer's name, phone and address.
+- **Leave Access token expiry at 3600.** This is not the session lifetime and raising it does not
+  help FR-005 — the client refreshes silently. It *does* set how long a leaked JWT stays usable.
+  Admin revocation is unaffected either way: `is_admin()` is evaluated per statement in Postgres, so
+  deleting an `admins` row takes effect immediately rather than at token expiry.
+- **Session timeouts** — *satisfied by the default*. Time-box and inactivity are both `0` (never),
+  which meets FR-005 and SC-010. On the free plan these are Pro-gated and cannot drift.
+  **If this project is ever upgraded to Pro, do not set either timeout below 30 days** — the vendor
+  would be signed out mid-week and passwordless sign-in would feel broken for the exact reason it
+  was chosen to avoid.
 
 Finally, create the admin user and grant it:
 
