@@ -140,7 +140,10 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
   empty state, not an error — and specifically **not** the seeded sample menu. An empty menu the
   vendor created deliberately must not be papered over with developer placeholder items at
   unconfirmed prices, which is the very thing this feature exists to abolish (FR-034).
-- **Two browser tabs editing the same item.** The last save wins; this is a single-admin product and the risk is accepted.
+- **Two browser tabs — or two admins — editing the same item.** The last save wins. With two
+  account holders this is a plausible event rather than a theoretical one, and it is accepted
+  deliberately: the loss is bounded to one item's fields, and neither admin can leave an item
+  half-saved or separated from its sizes (FR-032). Nothing warns either of them that it happened.
 - **The sign-in link doesn't arrive.** The vendor can request another without waiting out a
   cooldown they weren't told about, and the screen says plainly where the link was sent and to check
   spam. This is the feature's single point of failure, which is why FR-005 and FR-006 keep email off
@@ -255,7 +258,10 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
 
 ### Key Entities
 
-- **Admin account**: the single vendor login, identified by an email address and holding no password. Provisioned out of band; not self-service, and not something this feature creates.
+- **Admin account**: an entry on the allow-list, identified by an email address and holding no
+  password. Two exist — the business owner and the developer — with identical privileges. Provisioned
+  out of band; not self-service, and not something this feature creates. Removing one is a single
+  deletion, and deleting the underlying account revokes the grant automatically.
 - **Sign-in link**: a single-use, expiring credential emailed on request. Grants a session when opened; worthless afterwards.
 - **Category**: a named grouping with a position in the menu. Holds items; cannot be removed while it does.
 - **Menu item**: what a customer orders — name, optional description, optional photo, a category, availability, and either one price or a set of sizes. Also carries whether it has been removed: removed items are invisible to customers and absent from the vendor's normal list, but intact and restorable. Removed and unavailable are different states — unavailable is "not today", removed is "not any more".
@@ -284,7 +290,12 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
 
 ## Assumptions
 
-- **One admin, provisioned out of band.** A single account is created directly in the auth provider's console. There is no sign-up screen, no invitations and no roles.
+- **Two admins, provisioned out of band.** *Revised 2026-08-11: this said "one admin".* The business
+  owner and the developer both hold accounts, created directly in the auth provider's console and
+  added to the allow-list by hand. There is still no sign-up screen, no invitations and no roles —
+  **both accounts carry identical privileges**, including read access to every recorded order.
+  Nothing in the schema needed changing: the allow-list was always a table and the predicate was
+  always an existence check. What changed is which assumptions below are still safe.
 - **No passwords anywhere.** Sign-in is an emailed single-use link. There is nothing to forget and
   no reset flow to build. The obvious cost — depending on email to get in — is confined to first
   sign-in on a device: a session lasts at least 30 days and renews with use (FR-005, FR-006), so
@@ -300,8 +311,16 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
   vendor's public Instagram page;
   *(c)* accept and record it — **chosen**. Knowing the address gains an attacker nothing on its own:
   the credential is inbox access, and authorisation is the `admins` allow-list, not the address.
-  Revisit if the product ever gains a second admin, where the set of privileged addresses stops
-  being public knowledge.
+  **Revisited 2026-08-11 when the second admin was added**, which is the trigger this entry named.
+  Still accepted, but the reasoning is weaker and worth stating plainly: the owner's address is
+  public on the vendor's Instagram, so enumeration tells an attacker nothing new there. The
+  developer's is not public, and enumeration does confirm it holds an account — a real if modest
+  loss. It stays accepted because the address was never the secret, and because the two mitigations
+  that matter are already in place: the link dies in 15 minutes and self-signup is off at the
+  instance, so a discovered address cannot be turned into a session without the inbox behind it.
+  The trigger to actually fix this is no longer "a second admin" but **either** of: an admin whose
+  address is not otherwise discoverable and whose inbox lacks a second factor, or the account count
+  growing past people who personally know each other.
 - **The vendor's inbox is the credential, and it reaches customer data.** With no password and no
   second factor, inbox access converts to an admin session, and an admin session can read every
   order — customer names, phone numbers, delivery addresses. The 15-minute single-use link bounds
@@ -320,7 +339,15 @@ Whatever the vendor edits, deletes or mis-types, a customer browsing at that mom
   third size later means re-uploading, which is accepted: the vendor has the original on their phone.
 - **Sort order is the vendor's, not automatic.** Categories and items appear in the order the vendor sets by dragging, not alphabetically or by popularity. A newly added item goes last in its category until moved.
 - **Availability is a switch, not a count.** No stock quantities to keep in step (PRD §6.0).
-- **Concurrency is not a real risk.** One admin means simultaneous conflicting edits are vanishingly unlikely; last-write-wins is accepted.
+- **Concurrency is now possible but still not worth solving.** *Revised 2026-08-11.* This previously
+  read "one admin means simultaneous conflicting edits are vanishingly unlikely". With two admins
+  that reasoning is gone: the developer setting up the catalogue while the owner corrects a price is
+  an ordinary Tuesday, not a freak coincidence. Last-write-wins is **still** accepted, but now as a
+  judgement rather than an inherited fact — the menu is a few dozen items, the two admins are in
+  contact, and a lost edit is one retyped price rather than a corrupted order. `save_menu_item`
+  writes each item atomically (FR-032), so the loss is bounded to one item's fields; it cannot leave
+  an item half-saved or split from its sizes. Revisit if the catalogue grows large enough that the
+  two work in it simultaneously and unaware.
 - **The customer experience is not being redesigned.** Menu, cart, checkout and the WhatsApp handoff are finished and must keep behaving exactly as they do; this feature only changes where their data comes from.
 - **The provisional seed data is disposable.** Once the vendor enters the real menu, the seeded catalogue is replaced, not merged.
 - **Design is already decided.** Screens follow the wireframes in `Zeeli Admin Wireframes.dc.html` (turns 4–6) and the Modernist design system; this spec does not restate layout.

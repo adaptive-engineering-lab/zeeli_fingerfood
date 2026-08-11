@@ -63,7 +63,7 @@ most one sign-in link per week of daily use
 land in the customer chunk; the anonymous public keeps read access to available, non-removed items
 only
 
-**Scale/Scope**: one admin, tens of items, low write volume. 3 new tables/columns, 1 new pure module
+**Scale/Scope**: two admins (owner + developer, identical privileges), tens of items, low write volume. 3 new tables/columns, 1 new pure module
 group, ~8 new components, 2 migrations, 1 change to feature 001
 
 ## Constitution Check
