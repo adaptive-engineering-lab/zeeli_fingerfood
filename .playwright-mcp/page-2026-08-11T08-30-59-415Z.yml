@@ -1,0 +1,7 @@
+- generic [ref=f3e76]:
+  - heading "Sign in" [level=1] [ref=f3e77]
+  - generic [ref=f3e79]:
+    - generic [ref=f3e80]: Email
+    - textbox "Email" [active] [ref=f3e81]
+  - button "Email me a link" [ref=f3e82] [cursor=pointer]
+  - paragraph [ref=f3e83]: No password. We email a link that signs you in on this device and keeps you signed in.

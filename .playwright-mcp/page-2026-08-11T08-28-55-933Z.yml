@@ -1,0 +1,35 @@
+- generic [ref=e40]:
+  - banner [ref=e41]:
+    - generic [ref=e42]: Zeeli Admin
+    - navigation [ref=e43]:
+      - generic [ref=e44]: Menu
+      - button "Sign out" [ref=e45] [cursor=pointer]
+  - paragraph [ref=e46]: Signed in as novembercodes365@gmail.com
+  - generic [ref=e47]:
+    - navigation "Categories" [ref=e48]:
+      - button "Small Chops 3" [ref=e50] [cursor=pointer]
+      - button "Grills 2" [ref=e51] [cursor=pointer]
+      - button "Platters/Trays 2" [ref=e52] [cursor=pointer]
+      - button "Drinks 2" [ref=e53] [cursor=pointer]
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - generic [ref=e56]: Img
+        - generic [ref=e57]: Puff Puff (6pc)
+        - generic [ref=e58]: ₦800
+        - generic [ref=e59] [cursor=pointer]:
+          - checkbox "On" [checked] [ref=e60]
+          - generic [ref=e61]: "On"
+      - generic [ref=e62]:
+        - generic [ref=e63]: Img
+        - generic [ref=e64]: Chicken Samosa
+        - generic [ref=e65]: ₦1,200
+        - generic [ref=e66] [cursor=pointer]:
+          - checkbox "On" [checked] [ref=e67]
+          - generic [ref=e68]: "On"
+      - generic [ref=e69]:
+        - generic [ref=e70]: Img
+        - generic [ref=e71]: Spring Rolls
+        - generic [ref=e72]: ₦1,000
+        - generic [ref=e73] [cursor=pointer]:
+          - checkbox "Off" [ref=e74]
+          - generic [ref=e75]: "Off"

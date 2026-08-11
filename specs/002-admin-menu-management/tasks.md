@@ -82,7 +82,7 @@ See [research Finding 0](./research.md#finding-0-shipping-sign-in-would-open-a-p
       instance`. Session timeouts confirmed `0`/`0` (never), so FR-005 holds by default; they are
       Pro-gated on this plan and cannot drift. Email OTP expiration set to **900** (FR-004).
       All three parts complete
-- [ ] T008 Create the vendor's auth user, then `insert into public.admins` selecting its id — the
+- [x] T008 Create the vendor's auth user, then `insert into public.admins` selecting its id — the
       only row this feature adds
 
 ### Soft removal
@@ -128,18 +128,18 @@ See [research Finding 0](./research.md#finding-0-shipping-sign-in-would-open-a-p
 
 ### Proving the boundary
 
-- [ ] T012 Extend `scripts/verify-order-permissions.mjs` with a second identity: a real authenticated
+- [x] T012 Extend `scripts/verify-order-permissions.mjs` with a second identity: a real authenticated
       session **not** in `admins`. Assert it reads 0 orders, 0 order_items, 0 `admins` rows; that
       every catalogue write, storage upload and storage delete is rejected; and that it can still
       read available items like any visitor — per
       [quickstart scenario 1](./quickstart.md#scenario-1--a-signed-in-stranger-gets-nothing-sc-005-fr-007)
-- [ ] T067 Add the **positive** half to `scripts/verify-order-permissions.mjs`: with a session that
+- [x] T067 Add the **positive** half to `scripts/verify-order-permissions.mjs`: with a session that
       **is** in `admins`, assert it can read orders and `order_items`, write a catalogue row, upload
       to `menu-images`, and that `is_admin()` returns true for it. Every existing assertion in T012
       is a denial, and a policy that denied *everyone* — `using (false)`, a typo in the function name,
       a failed grant — would satisfy all of them while leaving the vendor locked out of their own
       product. Both halves are needed before either means anything
-- [ ] T013 Run `npm run verify:permissions` and confirm all assertions pass, then **deliberately add
+- [x] T013 Run `npm run verify:permissions` and confirm all assertions pass, then **deliberately add
       that user to `admins`, re-run, and confirm the new assertions fail**, then remove it. A
       permissions check that has only ever passed proves nothing
 
@@ -191,7 +191,7 @@ Sign-in UI may now be built.
       hides removed items from **customers**; the vendor's own session can read them, so without an
       explicit filter every removed item reappears in the list it was removed from — and
       `RemovedItemsPanel` (T028) becomes a duplicate view rather than the only one
-- [ ] T020 [US1] Verify quickstart scenarios 2, 3 and 4 in a browser: sign in by link, reload without
+- [x] T020 [US1] Verify quickstart scenarios 2, 3 and 4 in a browser: sign in by link, reload without
       being asked again, change a price and toggle availability, and see both on the customer menu
 
 **Checkpoint**: the vendor can run their own menu. Shippable alone.
@@ -244,7 +244,7 @@ Sign-in UI may now be built.
       Silently discarding a half-typed item is the failure most likely to make the vendor distrust
       the tool, and FR-032's "never a partially saved item" is only half the promise: the other half
       is that the vendor knows it did not save
-- [ ] T029 [US2] Update `src/features/menu/useMenu.js` to exclude `removed_at` items as defence in
+- [x] T029 [US2] Update `src/features/menu/useMenu.js` to exclude `removed_at` items as defence in
       depth beside the policy, which remains the guarantee (FR-016)
 - [ ] T053 [US2] Extend `imageResize.js` to produce **two** derivatives from one decode — card
       (long edge 800) and detail (1600) — and to reject non-images on **both** MIME type and a failed

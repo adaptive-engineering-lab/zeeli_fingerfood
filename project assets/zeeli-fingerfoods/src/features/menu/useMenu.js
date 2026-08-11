@@ -33,11 +33,22 @@ export function normaliseMenu(categoryRows, itemRows) {
 async function fetchMenu() {
   const [categories, items] = await Promise.all([
     supabase.from('categories').select('id, name, sort_order').order('sort_order'),
+    // Both filters are defence in depth — the policy already applies them for
+    // anonymous visitors, and the policy remains the guarantee (FR-011, FR-016).
+    //
+    // They are here because an ADMIN's session is not filtered by that policy:
+    // it may read unavailable and removed items. Without these lines the vendor
+    // opening their own storefront sees a different menu from the one customers
+    // see — they switch an item off, check the shop, still see it, and conclude
+    // the toggle is broken. Verified 2026-08-11: anonymous reads returned 8
+    // items where the signed-in admin's browser returned 9.
     supabase
       .from('menu_items')
       .select(
         'id, category_id, name, description, price, image_url, is_available, sort_order, menu_item_variants(id, label, price, is_available, sort_order)'
       )
+      .eq('is_available', true)
+      .is('removed_at', null)
       .order('sort_order'),
   ])
 

@@ -1,0 +1,8 @@
+- generic [ref=f5e12]:
+  - heading "Sign in" [level=1] [ref=f5e13]
+  - paragraph [ref=f5e15]: That link has already been used, or it has expired. Links last 15 minutes and work once — send yourself a fresh one.
+  - generic [ref=f5e16]:
+    - generic [ref=f5e17]: Email
+    - textbox "Email" [ref=f5e18]
+  - button "Email me a link" [ref=f5e19] [cursor=pointer]
+  - paragraph [ref=f5e20]: No password. We email a link that signs you in on this device and keeps you signed in.
