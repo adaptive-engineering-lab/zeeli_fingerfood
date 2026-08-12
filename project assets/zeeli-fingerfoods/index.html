@@ -5,6 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f3f2f2" />
+
+    <!-- Archivo is pulled in by an @import inside src/styles/modernist.css, which
+         is vendored verbatim from the design system and must not be hand-edited.
+         An @import is the worst shape for this: the browser cannot discover the
+         font host until it has downloaded and parsed our CSS, so DNS and TLS to
+         two Google hosts happen serially, on the critical path, after everything
+         else. Lighthouse measured 600ms of render-blocking on a 4G profile.
+
+         These hints start that handshake immediately, in parallel with the CSS,
+         without touching the vendored file. crossorigin on gstatic is required —
+         fonts are fetched in CORS mode, and without it the browser opens a second
+         connection and the preconnect is wasted. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <meta
       name="description"
       content="Small chops, grills and platters from Zeeli Finger Foods — browse the menu and send your order straight to WhatsApp."

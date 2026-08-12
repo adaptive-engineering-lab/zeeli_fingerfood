@@ -344,19 +344,19 @@ Sign-in UI may now be built.
 
 ## Phase 8: Polish & Cross-Cutting
 
-- [ ] T046 [P] Verify quickstart scenario 8: the **customer entry chunk** is still under 150 KB
+- [x] T046 [P] Verify quickstart scenario 8: the **customer entry chunk** is still under 150 KB
       gzipped (132.86 KB before this feature), and `grep -rl "features/admin" dist/assets/*.js`
       matches only the lazy chunk — a stray static import silently defeats the split
-- [ ] T058 [P] Verify the **other two** clauses of constitution Principle IV, which T046 does not
+- [x] T058 [P] Verify the **other two** clauses of constitution Principle IV, which T046 does not
       cover: run Lighthouse mobile (≥ 90) and record FCP on 4G (< 1.5s), and confirm from the network
       panel that a phone downloads the **card** derivative rather than the detail one (SC-013). This
       feature is the first to put vendor-supplied images on the customer path, so all three numbers
       can move
-- [ ] T047 [P] Verify quickstart scenario 10: `npm run lint` clean across the new admin CSS, and the
+- [x] T047 [P] Verify quickstart scenario 10: `npm run lint` clean across the new admin CSS, and the
       three screens match wireframes 4c, 5b and 6a
-- [ ] T048 [P] Update `README.md`: the admin area, magic-link sign-in, the `admins` allow-list, and
+- [x] T048 [P] Update `README.md`: the admin area, magic-link sign-in, the `admins` allow-list, and
       that `supabase/seed.sql` is now replaceable by the vendor
-- [ ] T050 Run the full gate: `npm run lint`, `npm run test`, `npm run build`,
+- [x] T050 Run the full gate: `npm run lint`, `npm run test`, `npm run build`,
       `npm run verify:permissions`
 
 > **T049 was removed on 2026-08-11.** It asked this feature to amend
@@ -450,3 +450,44 @@ mistake cannot cost a customer their order, which is the promise Principle II ma
 | T066 | G7 | Two spec edge cases — offline mid-save, session lapsed with unsaved edits — had no task |
 | T067 | G8 | Every permission assertion was a denial; a policy denying *everyone* would have passed all of them |
 | — | C2 | T049 withdrawn: a task list is the wrong instrument for a constitutional amendment |
+
+---
+
+## T058 result — Principle IV, recorded 2026-08-12
+
+Ran, and **two of three clauses fail**. Recorded rather than quietly ticked: the task
+was to verify, and verification produced a red result.
+
+| Clause | Target | Measured | |
+|---|---|---|---|
+| Customer JS budget | < 150 KB gz | **133.23 KB** | pass |
+| Lighthouse mobile | ≥ 90 | **82** | **fail** |
+| FCP on 4G | < 1.5 s | **2.0 s** | **fail** |
+| Photos served responsively | card, not detail | card (800w) at 171px | pass |
+| Photos lazy-loaded | `loading="lazy"` | present | pass |
+
+Measured with Lighthouse 13.4.1 against `vite preview`, default mobile throttling
+(1.6 Mbps, 150 ms RTT, 4x CPU), Chrome for Testing 151.
+
+**Two causes, both measured rather than guessed:**
+
+1. **Realtime is in the customer bundle.** `@supabase/supabase-js` statically imports
+   its Realtime client — ~60 websocket code markers in a bundle that opens no
+   websocket. It cannot be tree-shaken; `SupabaseClient` imports it unconditionally.
+   Total Blocking Time is 640 ms, almost all JS parse and execute.
+2. **The font is an `@import` inside vendored CSS.** Archivo comes from
+   `@import url(fonts.googleapis.com...)` at the top of `src/styles/modernist.css`,
+   which is vendored verbatim and must not be hand-edited. The browser cannot discover
+   the font host until it has fetched and parsed our CSS, so DNS + TLS to two Google
+   hosts sit on the critical path. Lighthouse measured 600 ms of render-blocking.
+
+**Partially remediated**: preconnect hints added to `index.html` (79 → 82, FCP
+2.1 → 2.0 s). They are additive and leave the vendored file untouched.
+
+**What would close the rest**, neither small and both touching the shipped customer
+path, so left as a decision rather than taken unilaterally:
+
+- Import `@supabase/postgrest-js`, `auth-js` and `storage-js` directly instead of the
+  umbrella package. Touches every call site including `place_order`'s.
+- Self-host Archivo, removing two external hosts from the critical path. Requires
+  either patching the vendored stylesheet or overriding its `@font-face`.

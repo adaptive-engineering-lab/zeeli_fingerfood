@@ -34,8 +34,11 @@ const HEX = /#[0-9a-fA-F]{3,8}\b/
 const VALUE_RULES = [
   [
     'font-family',
-    (value) => value.startsWith('var(--font-'),
-    'Font outside the system — use var(--font-heading) or var(--font-body).',
+    // `inherit` is not an escape from the system, it is a deferral to it: the
+    // cascade already resolved to a token on body. Form controls need exactly
+    // this, because they do not inherit type by default.
+    (value) => value.startsWith('var(--font-') || value === 'inherit',
+    'Font outside the system — use var(--font-heading), var(--font-body), or inherit.',
   ],
   [
     'border-radius',
@@ -69,6 +72,24 @@ for (const file of files) {
       }
     }
   })
+}
+
+// A rule the line-by-line checks structurally cannot make: they inspect
+// declarations that exist, and the failure here is one that does not.
+//
+// Buttons, inputs, selects and textareas do not inherit font-family. Without an
+// explicit rule the browser substitutes a UA default — Arial, next to Archivo —
+// and no stylesheet line is wrong, so nothing is flagged. It was found by
+// reading computed styles off a rendered page, which this script cannot do.
+// Asserting the rule exists is the cheap half, and it is the half that catches
+// a future refactor deleting it.
+const globals = readFileSync(join(SRC, 'index.css'), 'utf8')
+if (!/button[\s\S]{0,80}?font-family:\s*inherit/.test(globals.replace(/\/\*[\s\S]*?\*\//g, ''))) {
+  console.error(
+    "src/index.css  Form controls must inherit the page font — without it buttons\n" +
+      '    and inputs silently render in the browser default, not Archivo.'
+  )
+  violations += 1
 }
 
 console.log(

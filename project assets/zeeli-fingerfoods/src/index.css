@@ -20,3 +20,19 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* Form controls do not inherit the page font — browsers substitute a UA default,
+   which on this machine rendered buttons and inputs in Arial while everything
+   around them was Archivo. Constitution Principle III says the type is the
+   design system's, and this is the one route by which it silently stops being.
+
+   scripts/check-design-adherence.mjs cannot catch this: it flags a font-family
+   whose value is not a token, and here the declaration was simply absent. Found
+   2026-08-12 by reading computed styles off the rendered page rather than the
+   stylesheet. `inherit` rather than a token so the cascade keeps deciding. */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
