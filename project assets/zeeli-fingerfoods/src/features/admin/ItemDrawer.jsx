@@ -32,6 +32,12 @@ export default function ItemDrawer({ item, categories, onClose, onSaved }) {
 
   const set = (field) => (event) => setDraft({ ...draft, [field]: event.target.value })
 
+  const updateSize = (index, patch) =>
+    setDraft({
+      ...draft,
+      sizes: draft.sizes.map((size, at) => (at === index ? { ...size, ...patch } : size)),
+    })
+
   const handlePhoto = async (event) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -173,6 +179,93 @@ export default function ItemDrawer({ item, categories, onClose, onSaved }) {
           />
           {errors.price && <span className="drawer__err">{errors.price}</span>}
         </label>
+
+        {/* Wireframe 6a's repeater. The toggle sits between two hairlines, and
+            switching it on disables the base price above rather than hiding it,
+            so the vendor can see why the field stopped accepting input. */}
+        <div className="drawer__sizetoggle">
+          <label className="admin-row__switch">
+            <input
+              type="checkbox"
+              checked={draft.sellsInSizes}
+              onChange={(event) => {
+                const on = event.target.checked
+                setDraft({
+                  ...draft,
+                  sellsInSizes: on,
+                  // Clear the base price when switching on: an item is priced
+                  // one way or the other, and the database refuses both.
+                  price: on ? null : draft.price,
+                  sizes: on && draft.sizes.length === 0
+                    ? [{ id: null, label: '', price: '', isAvailable: true }]
+                    : draft.sizes,
+                })
+              }}
+            />
+            <span className="admin-row__switchlabel">Sells in sizes</span>
+          </label>
+        </div>
+
+        {draft.sellsInSizes && (
+          <div className="drawer__sizes">
+            <span className="admin-signin__label">Sizes</span>
+
+            {draft.sizes.map((size, index) => (
+              <div key={size.id ?? `new-${index}`} className="drawer__size">
+                <input
+                  className="input drawer__sizelabel"
+                  placeholder="Tray of 20"
+                  value={size.label}
+                  onChange={(event) => updateSize(index, { label: event.target.value })}
+                />
+                <input
+                  className="input drawer__sizeprice"
+                  inputMode="decimal"
+                  placeholder="3500"
+                  value={size.price}
+                  onChange={(event) => updateSize(index, { price: event.target.value })}
+                />
+                {/* Retiring a size hides it from customers while the item and
+                    its other sizes stay orderable (FR-025). Removing it deletes
+                    the tier outright — two different intentions. */}
+                <label className="drawer__sizeavail">
+                  <input
+                    type="checkbox"
+                    checked={size.isAvailable !== false}
+                    onChange={(event) => updateSize(index, { isAvailable: event.target.checked })}
+                  />
+                  <span className="admin-row__switchlabel">
+                    {size.isAvailable !== false ? 'On' : 'Off'}
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  className="drawer__sizedrop"
+                  aria-label={`Remove size ${size.label || index + 1}`}
+                  onClick={() => setDraft({
+                    ...draft,
+                    sizes: draft.sizes.filter((_, at) => at !== index),
+                  })}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+
+            {errors.sizes && <span className="drawer__err">{errors.sizes}</span>}
+
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() => setDraft({
+                ...draft,
+                sizes: [...draft.sizes, { id: null, label: '', price: '', isAvailable: true }],
+              })}
+            >
+              + Add size
+            </button>
+          </div>
+        )}
 
         <div className="drawer__actions">
           <button type="submit" className="btn btn--primary" disabled={saving}>

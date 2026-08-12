@@ -272,23 +272,23 @@ Sign-in UI may now be built.
 
 **Independent test**: add, reprice and retire a size; the customer picker and "from" price follow.
 
-- [ ] T031 [P] [US3] Extend `src/features/admin/itemValidation.test.js` with the sizes rules —
+- [x] T031 [P] [US3] Extend `src/features/admin/itemValidation.test.js` with the sizes rules —
       sizes-mode needs ≥1 size, blank labels and prices ≤ 0 fail, and a sized item MUST NOT also
       carry a base price
-- [ ] T032 [US3] Extend `src/features/admin/itemValidation.js` until T031 passes
-- [ ] T033 [US3] Add the variant repeater to `src/features/admin/ItemDrawer.jsx` per wireframe 6a —
+- [x] T032 [US3] Extend `src/features/admin/itemValidation.js` until T031 passes
+- [x] T033 [US3] Add the variant repeater to `src/features/admin/ItemDrawer.jsx` per wireframe 6a —
       add, rename, reprice, retire, remove
-- [ ] T034 [US3] Route every item save through the `save_menu_item` RPC from T060, item and sizes
+- [x] T034 [US3] Route every item save through the `save_menu_item` RPC from T060, item and sizes
       together, so the two can never disagree
       ([contracts/catalogue.md](./contracts/catalogue.md#5-save_menu_item--the-one-write-that-cannot-be-two-calls)).
       This replaces the item write from T025's drawer — there must be **one** save path, not an
       unsized one and a sized one
-- [ ] T061 [US3] Verify the atomicity is real rather than assumed: switch an item to sizes-mode and
+- [x] T061 [US3] Verify the atomicity is real rather than assumed: switch an item to sizes-mode and
       interrupt the save (offline, or a deliberately rejected call), then confirm the item is either
       entirely unchanged or entirely saved — never priced at nothing while still available. Also
       confirm a direct `save_menu_item` call from a signed-in **non-admin** session is refused by the
       function's own `is_admin()` check (SC-007, FR-032)
-- [ ] T035 [US3] Verify against the customer app: a retired size disappears from the picker while
+- [x] T035 [US3] Verify against the customer app: a retired size disappears from the picker while
       the item stays orderable, and the "from" price follows the cheapest **available** size (FR-026)
 
 ---

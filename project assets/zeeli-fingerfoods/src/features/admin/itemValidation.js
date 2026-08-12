@@ -43,6 +43,12 @@ export default function validateItem(draft = {}) {
     }
     if (sizes.length === 0) {
       errors.sizes = 'Add at least one size, or switch off selling in sizes.'
+    } else if (sizes.some((size) => isBlank(size?.label))) {
+      errors.sizes = 'Every size needs a label.'
+    } else if (sizes.some((size) => !isPositiveNumber(size?.price))) {
+      // `some`, not a check of the first: a good size followed by a bad one is
+      // the likely shape of the mistake, since the vendor adds rows in order.
+      errors.sizes = 'Every size needs a price above zero.'
     }
   } else if (!isPositiveNumber(draft.price)) {
     errors.price = 'Give the item a price above zero.'

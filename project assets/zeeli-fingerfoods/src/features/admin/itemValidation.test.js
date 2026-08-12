@@ -70,12 +70,83 @@ describe('validateItem — single-price items', () => {
   })
 
   it('does not demand a price when the item sells in sizes', () => {
-    // The sizes rules themselves arrive with T031; this only fixes the boundary
-    // so the price rule cannot claim territory that is not its own.
     const { errors } = validateItem(
       draft({ price: null, sellsInSizes: true, sizes: [{ label: '20 pieces', price: 5000 }] })
     )
 
     expect(errors).not.toHaveProperty('price')
+  })
+})
+
+// The Combo Tray sells as 20, 50 or 100 pieces. An item sellable at no price
+// must never reach a customer, which is what these rules exist to prevent.
+const sized = (sizes, overrides = {}) =>
+  draft({ price: null, sellsInSizes: true, sizes, ...overrides })
+
+describe('validateItem — items that sell in sizes', () => {
+  it('accepts a sized item with two sizes', () => {
+    const result = validateItem(
+      sized([
+        { label: 'Tray of 20', price: 3500 },
+        { label: 'Tray of 50', price: 7000 },
+      ])
+    )
+    expect(result).toEqual({ ok: true, errors: {} })
+  })
+
+  it('rejects sizes-mode with no sizes at all', () => {
+    expect(validateItem(sized([])).errors).toHaveProperty('sizes')
+  })
+
+  it('rejects a size with a blank label', () => {
+    expect(validateItem(sized([{ label: '', price: 3500 }])).errors).toHaveProperty('sizes')
+    expect(validateItem(sized([{ label: '   ', price: 3500 }])).errors).toHaveProperty('sizes')
+  })
+
+  it('rejects a size priced at zero or below', () => {
+    for (const price of [0, -1]) {
+      expect(validateItem(sized([{ label: 'Tray of 20', price }])).errors).toHaveProperty('sizes')
+    }
+  })
+
+  it('rejects a size with a missing or non-numeric price', () => {
+    for (const price of [null, undefined, '', 'free']) {
+      expect(validateItem(sized([{ label: 'Tray of 20', price }])).errors).toHaveProperty('sizes')
+    }
+  })
+
+  it('rejects one bad size among good ones', () => {
+    // The obvious implementation checks sizes[0] and stops.
+    const result = validateItem(
+      sized([
+        { label: 'Tray of 20', price: 3500 },
+        { label: 'Tray of 50', price: 0 },
+      ])
+    )
+    expect(result.ok).toBe(false)
+    expect(result.errors).toHaveProperty('sizes')
+  })
+
+  it('refuses a sized item that also carries a base price', () => {
+    // Two prices for one thing. FR-026 says the customer sees the cheapest
+    // available size, so a base price alongside them is unanswerable.
+    const result = validateItem(
+      sized([{ label: 'Tray of 20', price: 3500 }], { price: 5000 })
+    )
+    expect(result.errors).toHaveProperty('price')
+  })
+
+  it('still reports name and size faults together', () => {
+    const result = validateItem(sized([], { name: '' }))
+    expect(Object.keys(result.errors).sort()).toEqual(['name', 'sizes'])
+  })
+
+  it('ignores the sizes list entirely when the item is not sizes-mode', () => {
+    // Switching sizes-mode off with rubbish left in the list must not block a
+    // save — the sizes are discarded, not validated.
+    const result = validateItem(
+      draft({ sellsInSizes: false, price: 800, sizes: [{ label: '', price: -5 }] })
+    )
+    expect(result.ok).toBe(true)
   })
 })
