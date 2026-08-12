@@ -28,3 +28,4 @@ dist-ssr
 .playwright-mcp/
 .vercel
 .env*
+!.env.example
