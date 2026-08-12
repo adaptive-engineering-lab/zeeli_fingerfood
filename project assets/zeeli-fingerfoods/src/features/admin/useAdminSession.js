@@ -21,7 +21,22 @@ import { supabase } from '../../lib/supabaseClient'
 // vendor out of their own product. is_admin() is the one function the nine
 // policies also use, so the UI and the database cannot drift apart (FR-037).
 async function isAdmin() {
-  const { data, error } = await supabase.rpc('is_admin')
+  let { data, error } = await supabase.rpc('is_admin')
+
+  // PGRST303 — "JWT issued at future". Clock skew between the auth server that
+  // stamped the token and the database checking it. Observed in production on
+  // 2026-08-12, on the very first call after redeeming a sign-in link: the token
+  // was issued milliseconds earlier and Postgres had not caught up.
+  //
+  // It matters because this function fails closed, so a skewed clock resolves to
+  // 'not-admin' and shows the SIGN-IN SCREEN to someone who has just signed in
+  // successfully. It recovered that time only because onAuthStateChange happened
+  // to fire again — luck, not design. One short retry costs nothing and removes
+  // the coin flip.
+  if (error?.code === 'PGRST303') {
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    ;({ data, error } = await supabase.rpc('is_admin'))
+  }
 
   // Fail closed. A network blip must never read as "yes". This is only what the
   // UI shows; every write is checked again in Postgres regardless.
