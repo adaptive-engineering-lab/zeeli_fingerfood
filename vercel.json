@@ -1,0 +1,33 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd 'project assets/zeeli-fingerfoods' && npm ci",
+  "buildCommand": "cd 'project assets/zeeli-fingerfoods' && npm run build",
+  "outputDirectory": "project assets/zeeli-fingerfoods/dist",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/((?!assets/)(?!.*\\.[A-Za-z0-9]+$).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
