@@ -15,6 +15,7 @@ export function normaliseMenu(categoryRows, itemRows) {
     description: row.description ?? '',
     price: row.price === null || row.price === undefined ? null : Number(row.price),
     imageUrl: row.image_url ?? null,
+    imageCardUrl: row.image_card_url ?? null,
     isAvailable: row.is_available !== false,
     variants: (row.menu_item_variants ?? [])
       .slice()
@@ -45,7 +46,7 @@ async function fetchMenu() {
     supabase
       .from('menu_items')
       .select(
-        'id, category_id, name, description, price, image_url, is_available, sort_order, menu_item_variants(id, label, price, is_available, sort_order)'
+        'id, category_id, name, description, price, image_url, image_card_url, is_available, sort_order, menu_item_variants(id, label, price, is_available, sort_order)'
       )
       .eq('is_available', true)
       .is('removed_at', null)

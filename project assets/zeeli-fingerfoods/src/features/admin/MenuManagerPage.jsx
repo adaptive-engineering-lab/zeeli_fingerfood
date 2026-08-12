@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import useAdminMenu from './useAdminMenu'
+import ItemDrawer from './ItemDrawer'
+import RemovedItemsPanel from './RemovedItemsPanel'
 import { formatNaira } from '../../lib/money'
 
 /**
@@ -17,6 +19,8 @@ export default function MenuManagerPage({ email, onSignOut }) {
   const [activeCategory, setActiveCategory] = useState(null)
   const [saving, setSaving] = useState(null)
   const [saveError, setSaveError] = useState(null)
+  const [editing, setEditing] = useState(null)
+  const [showingRemoved, setShowingRemoved] = useState(false)
 
   useEffect(() => {
     if (categories.length === 0) return
@@ -51,7 +55,12 @@ export default function MenuManagerPage({ email, onSignOut }) {
     reload()
   }
 
-  if (loading) return <p className="status-line">Loading the menu…</p>
+  // Only on the FIRST load, while there is genuinely nothing to show. Every
+  // save calls reload(), which sets loading true again — and returning early
+  // here unmounted the whole page including the open drawer, taking the
+  // vendor's half-typed item with it. Found 2026-08-12: adding a photo to a new
+  // item silently reset the form to blank, after the item had already saved.
+  if (loading && items.length === 0) return <p className="status-line">Loading the menu…</p>
 
   if (error) {
     return (
@@ -97,6 +106,20 @@ export default function MenuManagerPage({ email, onSignOut }) {
         </nav>
 
         <section className="admin__items">
+          <div className="admin__itemshead">
+            <button
+              type="button"
+              className="btn btn--primary"
+              disabled={categories.length === 0}
+              onClick={() => setEditing({})}
+            >
+              + New item
+            </button>
+            <button type="button" className="btn btn--ghost" onClick={() => setShowingRemoved(true)}>
+              Removed items
+            </button>
+          </div>
+
           {saveError && <p className="admin__error">{saveError}</p>}
 
           {visibleItems.length === 0 ? (
@@ -105,9 +128,17 @@ export default function MenuManagerPage({ email, onSignOut }) {
             visibleItems.map((item) => (
               <div key={item.id} className="admin-row">
                 <span className="admin-row__thumb" aria-hidden="true">
-                  {item.imageUrl ? <img src={item.imageUrl} alt="" loading="lazy" /> : 'Img'}
+                  {/* the card derivative: a 26px thumbnail has no business
+                      downloading the 1600px detail image */}
+                  {item.imageCardUrl ?? item.imageUrl ? (
+                    <img src={item.imageCardUrl ?? item.imageUrl} alt="" loading="lazy" />
+                  ) : (
+                    'Img'
+                  )}
                 </span>
-                <span className="admin-row__name">{item.name}</span>
+                <button type="button" className="admin-row__name admin-row__edit" onClick={() => setEditing(item)}>
+                  {item.name}
+                </button>
                 <span className="admin-row__price">
                   {item.sellsInSizes ? cheapestSize(item) : formatNaira(item.price)}
                 </span>
@@ -127,6 +158,23 @@ export default function MenuManagerPage({ email, onSignOut }) {
           )}
         </section>
       </div>
+
+      {editing && (
+        <ItemDrawer
+          item={editing.id ? editing : null}
+          categories={categories}
+          onClose={() => setEditing(null)}
+          onSaved={reload}
+        />
+      )}
+
+      {showingRemoved && (
+        <RemovedItemsPanel
+          categories={categories}
+          onChanged={reload}
+          onClose={() => setShowingRemoved(false)}
+        />
+      )}
     </div>
   )
 }

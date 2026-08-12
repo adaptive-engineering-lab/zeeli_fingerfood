@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Playwright MCP output (screenshots, snapshots, upload fixtures)
+.playwright-mcp/

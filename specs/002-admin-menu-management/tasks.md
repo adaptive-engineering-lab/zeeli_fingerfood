@@ -206,39 +206,39 @@ Sign-in UI may now be built.
 
 ### Tests first
 
-- [ ] T021 [P] [US2] Write failing tests in `src/features/admin/imageResize.test.js` for
+- [x] T021 [P] [US2] Write failing tests in `src/features/admin/imageResize.test.js` for
       `targetSize` — landscape, portrait, already-small (**never upscale**), square, extreme ratios
-- [ ] T022 [P] [US2] Write failing tests in `src/features/admin/storagePaths.test.js` — path starts
+- [x] T022 [P] [US2] Write failing tests in `src/features/admin/storagePaths.test.js` — path starts
       with the item prefix, two calls differ, extension honoured
 
 ### Implementation
 
-- [ ] T023 [US2] Create `src/features/admin/imageResize.js`: pure `targetSize` plus `reduceImage`
+- [x] T023 [US2] Create `src/features/admin/imageResize.js`: pure `targetSize` plus `reduceImage`
       (`createImageBitmap` → canvas → `toBlob`, webp preferred, jpeg fallback, quality 0.82, long
       edge 1600). It MUST reject rather than upload an original when the browser cannot do the work
       (FR-021) — **no dependency**, per [research D5](./research.md#d5-reducing-photos-on-the-device)
-- [ ] T024 [P] [US2] Create `src/features/admin/storagePaths.js` until T022 passes
-- [ ] T025 [US2] Create `src/features/admin/ItemDrawer.jsx` to **wireframe 6a** — a side drawer on
+- [x] T024 [P] [US2] Create `src/features/admin/storagePaths.js` until T022 passes
+- [x] T025 [US2] Create `src/features/admin/ItemDrawer.jsx` to **wireframe 6a** — a side drawer on
       desktop, a bottom sheet at phone width reusing the CSS idiom already in
       `src/features/menu/ItemSheet.jsx`
-- [ ] T026 [US2] Implement photo attach and replace: upload new → point the row at it → delete the
+- [x] T026 [US2] Implement photo attach and replace: upload new → point the row at it → delete the
       old. Never delete first ([research D6](./research.md#d6-photo-lifecycle))
-- [ ] T027 [US2] Implement remove (sets `removed_at`), restore (clears it), and discard (deletes the
+- [x] T027 [US2] Implement remove (sets `removed_at`), restore (clears it), and discard (deletes the
       row, then clears its storage prefix — row first, since an orphaned object is recoverable and a
       photo-less row is not)
-- [ ] T064 [US2] Add the confirmation step FR-012 requires before a removal takes effect, naming the
+- [x] T064 [US2] Add the confirmation step FR-012 requires before a removal takes effect, naming the
       item. Removal is reversible, so a plain confirm is right — **not** type-to-confirm, which the
       clarification session explicitly rejected. Discard (T027) is the irreversible edge and needs a
       distinctly stronger confirmation that says the photo goes too and that this cannot be undone;
       the two MUST NOT look alike, or the vendor learns to dismiss both
-- [ ] T028 [US2] Create `src/features/admin/RemovedItemsPanel.jsx` — find and restore a removed item,
+- [x] T028 [US2] Create `src/features/admin/RemovedItemsPanel.jsx` — find and restore a removed item,
       or discard it outright
-- [ ] T065 [US2] Handle restoring an item whose category was removed while it was away: ask the
+- [x] T065 [US2] Handle restoring an item whose category was removed while it was away: ask the
       vendor which category it should return to and restore it there. It MUST NOT fail with an error,
       and MUST NOT come back with no category — T051's trigger blocks removing a category holding
       *live* items, but a removed item does not block it, so this state is reachable by design rather
       than by accident (spec edge case, FR-013)
-- [ ] T066 [US2] Tell the vendor plainly when a save does not land — the device is offline, the
+- [x] T066 [US2] Tell the vendor plainly when a save does not land — the device is offline, the
       session lapsed mid-edit, or the write is rejected — and keep their unsaved edits on screen
       rather than clearing the form. Two spec edge cases require this and no task covered either.
       Silently discarding a half-typed item is the failure most likely to make the vendor distrust
@@ -246,19 +246,19 @@ Sign-in UI may now be built.
       is that the vendor knows it did not save
 - [x] T029 [US2] Update `src/features/menu/useMenu.js` to exclude `removed_at` items as defence in
       depth beside the policy, which remains the guarantee (FR-016)
-- [ ] T053 [US2] Extend `imageResize.js` to produce **two** derivatives from one decode — card
+- [x] T053 [US2] Extend `imageResize.js` to produce **two** derivatives from one decode — card
       (long edge 800) and detail (1600) — and to reject non-images on **both** MIME type and a failed
       `createImageBitmap`, since a file renamed `.jpg` is only proved by the decode attempt (FR-019,
       FR-035). One stored size cannot be served responsively, which constitution Principle IV
       requires
-- [ ] T054 [P] [US2] Extend `storagePaths.js` to `photoPaths()` returning card and detail paths that
+- [x] T054 [P] [US2] Extend `storagePaths.js` to `photoPaths()` returning card and detail paths that
       share one random stem, so a replacement releases the pair together (FR-022)
-- [ ] T055 [US2] Upload both derivatives, store both URLs (`image_url`, `image_card_url`), and
+- [x] T055 [US2] Upload both derivatives, store both URLs (`image_url`, `image_card_url`), and
       release **both** on replace and on discard
-- [ ] T056 [US2] Update `src/features/menu/MenuItemCard.jsx` to serve the card derivative via
+- [x] T056 [US2] Update `src/features/menu/MenuItemCard.jsx` to serve the card derivative via
       `srcset`/`sizes` with the detail size as the large candidate, keep `loading="lazy"`, and add
       `image_card_url` to `useMenu.js`'s select list (FR-035, FR-036, SC-013)
-- [ ] T030 [US2] Verify quickstart scenarios 5 and 6: time a phone-based add under 60s, confirm the
+- [x] T030 [US2] Verify quickstart scenarios 5 and 6: time a phone-based add under 60s, confirm the
       stored object is a few hundred KB not multi-megabyte, reject a PDF, pass through an
       already-small image, then remove → restore → discard and reconcile storage against live rows
 

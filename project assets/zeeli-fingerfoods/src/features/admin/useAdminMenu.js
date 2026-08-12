@@ -59,7 +59,16 @@ export default function useAdminMenu() {
         name: row.name,
         description: row.description ?? '',
         price: row.price === null ? null : Number(row.price),
-        imageUrl: row.image_card_url ?? row.image_url ?? null,
+        // BOTH, kept distinct. An earlier version collapsed these into a single
+        // `imageUrl` preferring the card, which was quietly destructive: the
+        // drawer round-trips whatever it is given straight back through
+        // save_menu_item, so opening an item with a photo and pressing Save
+        // wrote the CARD url into image_url and null into image_card_url —
+        // losing the detail derivative's only reference and orphaning the object
+        // in storage. Found 2026-08-12 when the drawer showed "Add photo" for an
+        // item that had one.
+        imageUrl: row.image_url ?? null,
+        imageCardUrl: row.image_card_url ?? null,
         isAvailable: row.is_available !== false,
         sellsInSizes: row.has_variants === true,
         sizes: (row.menu_item_variants ?? [])

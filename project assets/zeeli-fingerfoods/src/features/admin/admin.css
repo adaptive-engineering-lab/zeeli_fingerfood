@@ -236,3 +236,220 @@
     width: 100%;
   }
 }
+
+/* Buttons ----------------------------------------------------------------
+   The customer layer names its primary action `.cta` and its outline action
+   `.options-btn`. The admin layer needs the same two shapes under names that do
+   not read as a customer call-to-action, so they are defined here rather than
+   borrowed — admin.css rides the lazy chunk, so this costs the customer route
+   nothing. Both follow the same Modernist idiom: flat, no radius, uppercase. */
+
+.btn {
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  color: var(--color-bg);
+  background: var(--color-accent);
+  border: 0;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-accent-600);
+}
+
+.btn--ghost {
+  color: var(--color-text);
+  background: transparent;
+  border: 1.5px solid var(--color-text);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+}
+
+/* Item drawer — wireframe 6a --------------------------------------------- */
+
+.drawer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
+}
+
+.drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-top: 2px solid var(--color-text);
+}
+
+/* Desktop is 6a's side drawer over the list; phone width reuses the bottom
+   sheet the customer app already establishes in ItemSheet.jsx. */
+@media (min-width: 768px) {
+  .drawer-scrim {
+    align-items: stretch;
+  }
+
+  .drawer {
+    width: min(290px, 100%);
+    max-height: 100vh;
+    border-top: 0;
+    border-left: 2px solid var(--color-text);
+  }
+}
+
+.drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.drawer__close {
+  border: 0;
+  background: none;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.drawer__rule {
+  height: 2px;
+  background: var(--color-text);
+}
+
+.drawer__photo {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+.drawer__thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 64px;
+  height: 52px;
+  background: var(--color-surface);
+  font-size: 8px;
+  color: var(--color-neutral-600);
+}
+
+.drawer__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.drawer__photoside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.drawer__file {
+  display: block;
+}
+
+.drawer__hint {
+  font-size: 10px;
+  color: var(--color-neutral-600);
+}
+
+.drawer__err {
+  font-weight: 700;
+  font-size: 10.5px;
+  color: var(--color-accent-700);
+}
+
+.drawer__actions {
+  display: flex;
+  gap: 7px;
+}
+
+.drawer__actions .btn {
+  flex: 1;
+}
+
+.drawer__remove {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--color-accent-700);
+  cursor: pointer;
+}
+
+.drawer__confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 2px solid var(--color-accent);
+}
+
+.drawer__confirmtext {
+  margin: 0;
+  font-size: 11.5px;
+}
+
+.drawer__confirminline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.admin__itemshead {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: 9px;
+}
+
+.admin-row__edit {
+  border: 0;
+  background: none;
+  padding: 0;
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 12.5px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.admin-row__edit:hover {
+  color: var(--color-accent-700);
+}
