@@ -299,19 +299,19 @@ Sign-in UI may now be built.
 
 **Independent test**: [quickstart](./quickstart.md) scenario 9, on desktop **and** a phone.
 
-- [ ] T036 [P] [US4] Write failing tests in `src/features/admin/sortOrder.test.js` — contiguous
+- [x] T036 [P] [US4] Write failing tests in `src/features/admin/sortOrder.test.js` — contiguous
       renumbering, a no-op move yields no changed rows, new items land last, `changedRows` returns
       only the affected span, empty and single-item lists are safe
-- [ ] T037 [US4] Create `src/features/admin/sortOrder.js` until T036 passes
-- [ ] T038 [US4] Create `src/features/admin/CategoryPanel.jsx` — create, rename, reorder, and remove
+- [x] T037 [US4] Create `src/features/admin/sortOrder.js` until T036 passes
+- [x] T038 [US4] Create `src/features/admin/CategoryPanel.jsx` — create, rename, reorder, and remove
       with the guard: refused while **live** items remain, with a count; already-removed items don't
       block it (FR-030)
-- [ ] T039 [US4] Implement item reordering in `MenuManagerPage.jsx`: native HTML5 drag on pointer
+- [x] T039 [US4] Implement item reordering in `MenuManagerPage.jsx`: native HTML5 drag on pointer
       devices **and** always-visible move up/down controls. The controls are the primary path on a
       phone, not a fallback (FR-029) — no drag-and-drop dependency
       ([research D7](./research.md#d7-ordering))
-- [ ] T040 [US4] Persist only `changedRows` from a reorder rather than rewriting the category
-- [ ] T041 [US4] Verify quickstart scenario 9 on desktop and on a phone; confirm the customer menu
+- [x] T040 [US4] Persist only `changedRows` from a reorder rather than rewriting the category
+- [x] T041 [US4] Verify quickstart scenario 9 on desktop and on a phone; confirm the customer menu
       reflects both category and item order
 
 ---

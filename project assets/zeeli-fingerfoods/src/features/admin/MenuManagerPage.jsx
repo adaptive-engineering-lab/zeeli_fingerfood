@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabaseClient'
 import useAdminMenu from './useAdminMenu'
 import ItemDrawer from './ItemDrawer'
 import RemovedItemsPanel from './RemovedItemsPanel'
+import CategoryPanel from './CategoryPanel'
+import { reorder, move, changedRows } from './sortOrder'
 import { formatNaira } from '../../lib/money'
 
 /**
@@ -21,6 +23,9 @@ export default function MenuManagerPage({ email, onSignOut }) {
   const [saveError, setSaveError] = useState(null)
   const [editing, setEditing] = useState(null)
   const [showingRemoved, setShowingRemoved] = useState(false)
+  const [showingCategories, setShowingCategories] = useState(false)
+  const [dragFrom, setDragFrom] = useState(null)
+  const [order, setOrder] = useState(null)
 
   useEffect(() => {
     if (categories.length === 0) return
@@ -31,8 +36,43 @@ export default function MenuManagerPage({ email, onSignOut }) {
     )
   }, [categories])
 
+  useEffect(() => {
+    setOrder(null)
+  }, [activeCategory, items])
+
   const countFor = (categoryId) => items.filter((item) => item.categoryId === categoryId).length
-  const visibleItems = items.filter((item) => item.categoryId === activeCategory)
+
+  // Local order wins while a drag is settling, so the row does not snap back to
+  // its old position for the moment between drop and reload.
+  const visibleItems =
+    order ?? items.filter((item) => item.categoryId === activeCategory)
+
+  const counts = Object.fromEntries(categories.map((c) => [c.id, countFor(c.id)]))
+
+  // Only the rows that moved (T040) — a reorder near the top of a long category
+  // writes two rows, not thirty.
+  const persistOrder = async (next) => {
+    const before = visibleItems
+    const rowsToWrite = changedRows(before, next)
+    setOrder(next)
+    if (rowsToWrite.length === 0) return
+
+    setSaveError(null)
+    const results = await Promise.all(
+      rowsToWrite.map((row) =>
+        supabase.from('menu_items').update({ sort_order: row.sort_order }).eq('id', row.id)
+      )
+    )
+    const failed = results.find((result) => result.error)
+    if (failed) {
+      console.error('Could not save the order:', failed.error)
+      setSaveError('Could not save the new order. Reload to see what stuck.')
+      setOrder(null)
+      return
+    }
+    await reload()
+    setOrder(null)
+  }
 
   // Availability is a straight column write — the only catalogue change simple
   // enough not to need save_menu_item, since it touches one row and no sizes.
@@ -118,6 +158,9 @@ export default function MenuManagerPage({ email, onSignOut }) {
             <button type="button" className="btn btn--ghost" onClick={() => setShowingRemoved(true)}>
               Removed items
             </button>
+            <button type="button" className="btn btn--ghost" onClick={() => setShowingCategories(true)}>
+              Categories
+            </button>
           </div>
 
           {saveError && <p className="admin__error">{saveError}</p>}
@@ -125,8 +168,22 @@ export default function MenuManagerPage({ email, onSignOut }) {
           {visibleItems.length === 0 ? (
             <p className="status-line">Nothing in this category yet.</p>
           ) : (
-            visibleItems.map((item) => (
-              <div key={item.id} className="admin-row">
+            visibleItems.map((item, index) => (
+              <div
+                key={item.id}
+                className={dragFrom === index ? 'admin-row admin-row--dragging' : 'admin-row'}
+                draggable
+                onDragStart={() => setDragFrom(index)}
+                onDragEnd={() => setDragFrom(null)}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => {
+                  if (dragFrom !== null && dragFrom !== index) {
+                    persistOrder(reorder(visibleItems, dragFrom, index))
+                  }
+                  setDragFrom(null)
+                }}
+              >
+                <span className="admin-row__grip" aria-hidden="true">⠿</span>
                 <span className="admin-row__thumb" aria-hidden="true">
                   {/* the card derivative: a 26px thumbnail has no business
                       downloading the 1600px detail image */}
@@ -142,6 +199,27 @@ export default function MenuManagerPage({ email, onSignOut }) {
                 <span className="admin-row__price">
                   {item.sellsInSizes ? cheapestSize(item) : formatNaira(item.price)}
                 </span>
+                {/* Always drawn, on every device. FR-029: dragging a row inside
+                    a scrolling list fights the scroll on a phone, so these are
+                    the primary path there rather than a degraded fallback. */}
+                <button
+                  type="button"
+                  className="drawer__sizedrop"
+                  aria-label={`Move ${item.name} up`}
+                  disabled={index === 0}
+                  onClick={() => persistOrder(move(visibleItems, index, -1))}
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  className="drawer__sizedrop"
+                  aria-label={`Move ${item.name} down`}
+                  disabled={index === visibleItems.length - 1}
+                  onClick={() => persistOrder(move(visibleItems, index, +1))}
+                >
+                  ↓
+                </button>
                 <label className="admin-row__switch">
                   <input
                     type="checkbox"
@@ -165,6 +243,15 @@ export default function MenuManagerPage({ email, onSignOut }) {
           categories={categories}
           onClose={() => setEditing(null)}
           onSaved={reload}
+        />
+      )}
+
+      {showingCategories && (
+        <CategoryPanel
+          categories={categories}
+          counts={counts}
+          onChanged={reload}
+          onClose={() => setShowingCategories(false)}
         />
       )}
 

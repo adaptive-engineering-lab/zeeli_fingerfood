@@ -52,10 +52,24 @@ export default function useAdminMenu() {
     }
 
     setState({
-      categories: (categories.data ?? []).map((row) => ({ id: row.id, name: row.name })),
+      // sort_order is carried through verbatim, snake_case and all, because it
+      // is round-tripped straight back to the column by sortOrder.js. Dropping
+      // it here was quietly destructive: CategoryPanel had to synthesise
+      // positions from the array index, those did not match the stored values,
+      // and changedRows then wrote only the rows whose *index* moved — leaving
+      // stale stored values behind. Two categories ended up sharing sort_order
+      // 3, which is the one failure the sortOrder tests exist to prevent.
+      categories: (categories.data ?? []).map((row) => ({
+        id: row.id,
+        name: row.name,
+        sort_order: row.sort_order ?? 0,
+      })),
       items: (items.data ?? []).map((row) => ({
         id: row.id,
         categoryId: row.category_id,
+        // Same reason. Without it every item compared as 'changed', so a reorder
+        // rewrote the whole category instead of the rows that moved (T040).
+        sort_order: row.sort_order ?? 0,
         name: row.name,
         description: row.description ?? '',
         price: row.price === null ? null : Number(row.price),

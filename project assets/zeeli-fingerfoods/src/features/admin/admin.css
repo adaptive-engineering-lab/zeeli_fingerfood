@@ -505,3 +505,52 @@
 .drawer__sizedrop:hover {
   color: var(--color-accent-700);
 }
+
+/* Ordering — wireframe 5b's drag handles ---------------------------------- */
+
+.admin-row__grip {
+  flex: none;
+  font-size: 12px;
+  color: var(--color-neutral-400);
+  cursor: grab;
+}
+
+.admin-row--dragging {
+  opacity: 0.4;
+}
+
+.admin-row[draggable='true'] {
+  /* the row is the drag source, but text selection inside it should still work
+     for the price and name */
+  user-select: none;
+}
+
+/* Touch targets.
+
+   The move controls measured 15x16 CSS px, which passes "is it visible" and
+   fails "can the vendor hit it with a thumb". FR-029 does not say the touch
+   path must exist, it says ordering must be USABLE on a phone — and 5b's
+   drag handle is the thing it is replacing there, so this is the primary
+   control, not a fallback.
+
+   Keyed on a coarse pointer as well as width: a small window on a laptop still
+   has a mouse, and there is no reason to grow the buttons for it. */
+@media (pointer: coarse), (max-width: 767px) {
+  .drawer__sizedrop,
+  .admin-row .drawer__sizedrop {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .admin-row__switch,
+  .drawer__sizeavail {
+    min-height: 44px;
+  }
+
+  /* The grip is decorative on touch — the buttons are how ordering happens
+     there, and a drag handle that cannot be dragged only misleads. */
+  .admin-row__grip {
+    display: none;
+  }
+}
