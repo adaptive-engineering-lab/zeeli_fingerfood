@@ -60,9 +60,23 @@ async function fetchMenu() {
 }
 
 /**
- * Loads the menu, falling back to the seed data whenever Supabase is not
- * configured or the read fails — the Instagram link must never land on a blank
- * page. `usingFallback` lets the UI say so instead of pretending it is live.
+ * Loads the menu, falling back to the seed data when the catalogue cannot be
+ * READ — the client is unconfigured, the network is down, the query errored.
+ * The Instagram link must never land on a blank page, and `usingFallback` lets
+ * the UI say the prices are samples rather than pretending they are live.
+ *
+ * An empty catalogue is NOT a failure and must never reach that fallback
+ * (FR-034, SC-014). Zero rows is an answer: the vendor removed or switched off
+ * everything, and the honest response is an empty menu.
+ *
+ * This distinction is the entire point. The vendor's first act with the admin
+ * panel is to clear the developer's seeded placeholder catalogue and enter
+ * their own — and the previous version treated that successful empty read as a
+ * failure and served the seed straight back. Customers would have been offered
+ * Puff Puff and Combo Trays at prices nobody at Zeeli ever confirmed,
+ * orderable, with a WhatsApp message to match. Feature 002 exists to abolish
+ * the placeholder catalogue; papering over its removal would have been the
+ * exact opposite.
  */
 export default function useMenu() {
   const [state, setState] = useState({
@@ -94,13 +108,11 @@ export default function useMenu() {
     fetchMenu()
       .then((menu) => {
         if (cancelled) return
-        if (menu.items.length === 0) {
-          showSeedMenu()
-          return
-        }
+        // Read succeeded. Whatever came back is the truth, including nothing.
         setState({ ...menu, loading: false, usingFallback: false })
       })
       .catch((error) => {
+        // Read failed. Only here does the seed belong.
         console.error('Menu load failed, showing placeholder menu:', error)
         showSeedMenu()
       })

@@ -29,7 +29,13 @@ export function buildOrderMessage(order) {
     order
 
   const head = [
-    '🛍️ New Order — Zeeli Finger Foods',
+    // No emoji here, deliberately. wa.me's redirect to api.whatsapp.com
+    // re-encodes the text parameter and destroys anything outside the Basic
+    // Multilingual Plane: 🛍️ (U+1F6CD + U+FE0F) arrived as U+FFFD, so every
+    // order the vendor received opened with a replacement character. BMP
+    // characters survive intact — the em dash and ₦ below are proof, and they
+    // are why this line keeps its typography. Verified 2026-08-12.
+    'New Order — Zeeli Finger Foods',
     `Name: ${customerName}`,
     `Phone: ${customerPhone}`,
     `Delivery/Pickup: ${fulfillmentType === 'delivery' ? 'Delivery' : 'Pickup'}`,

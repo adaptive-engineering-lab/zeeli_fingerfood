@@ -322,22 +322,22 @@ Sign-in UI may now be built.
 
 **Independent test**: [quickstart](./quickstart.md) scenario 7.
 
-- [ ] T042 [US5] Verify quickstart scenario 7 — the one this plan exists to prevent: put an item in
+- [x] T042 [US5] Verify quickstart scenario 7 — the one this plan exists to prevent: put an item in
       a customer cart, **discard** it as the vendor, then complete checkout. The order MUST still be
       recorded, with its line intact from snapshots and `menu_item_id` null, and WhatsApp MUST still
       open. Without T010 this records nothing at all
-- [ ] T043 [US5] Verify the same flow for a **soft** removal and for a rename — both should already
+- [x] T043 [US5] Verify the same flow for a **soft** removal and for a rename — both should already
       work via 001's snapshots; confirm rather than assume
-- [ ] T057 [US5] Fix `src/features/menu/useMenu.js:85`, which calls `showSeedMenu()` when a
+- [x] T057 [US5] Fix `src/features/menu/useMenu.js:85`, which calls `showSeedMenu()` when a
       **successful** read returns zero rows. Once the vendor clears the seeded catalogue to enter
       their own, customers would get the placeholder menu back — sample items at unconfirmed prices,
       orderable. Seed only when the read **failed** (unconfigured client, network error, query
       error); a successful empty read renders the empty state (FR-034, SC-014,
       [research D11](./research.md#d11-what-customers-see-when-the-catalogue-is-legitimately-empty)).
       **Must precede T044**, which otherwise fails
-- [ ] T044 [US5] Verify the customer menu shows a clear empty state, not an error, when every item is
+- [x] T044 [US5] Verify the customer menu shows a clear empty state, not an error, when every item is
       unavailable or removed (FR-033) — and specifically **not** the sample menu (SC-014)
-- [ ] T045 [US5] Verify an anonymous visitor cannot read a removed item by any route — not the menu,
+- [x] T045 [US5] Verify an anonymous visitor cannot read a removed item by any route — not the menu,
       not a category, not a direct query (FR-016)
 
 ---

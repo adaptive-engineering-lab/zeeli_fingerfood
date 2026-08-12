@@ -36,7 +36,7 @@ describe('buildOrderMessage', () => {
   it('renders the PRD template for a delivery order', () => {
     expect(buildOrderMessage(baseOrder)).toBe(
       [
-        '🛍️ New Order — Zeeli Finger Foods',
+        'New Order — Zeeli Finger Foods',
         'Name: Ada Obi',
         'Phone: 08012345678',
         'Delivery/Pickup: Delivery',

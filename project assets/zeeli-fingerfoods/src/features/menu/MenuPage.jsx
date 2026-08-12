@@ -85,6 +85,15 @@ export default function MenuPage() {
 
         {loading ? (
           <p className="status-line">Loading the menu…</p>
+        ) : items.length === 0 ? (
+          /* The whole catalogue is empty, not just this category — the vendor
+             has switched everything off or is mid-way through building their
+             menu. A clear, calm empty state, never an error and never the
+             seeded sample menu (FR-033, FR-034). */
+          <div className="empty">
+            <p>The menu isn’t available right now.</p>
+            <p>Zeeli is updating it — please check back shortly.</p>
+          </div>
         ) : visibleItems.length === 0 ? (
           <p className="status-line">Nothing in this category yet.</p>
         ) : (

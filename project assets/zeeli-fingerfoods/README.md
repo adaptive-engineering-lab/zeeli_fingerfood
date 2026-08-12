@@ -120,10 +120,14 @@ It exists so the live read path is exercised and order lines record real
 placeholder. The admin panel (PRD phase 2) is how the vendor replaces it.
 
 ## Still needed before this is customer-ready
-- **Vendor's WhatsApp number** — `VITE_VENDOR_WHATSAPP_NUMBER` is still the `234000…`
-  placeholder, so checkout opens a chat with nobody. This is the last thing between
-  the app and a working site.
-- Confirmed category list, items and prices to replace `supabase/seed.sql`
+- ~~Vendor's WhatsApp number~~ — **set 2026-08-12** to the vendor's real number.
+  It lives in `.env` (gitignored) as `VITE_VENDOR_WHATSAPP_NUMBER`, digits only with
+  the country code and no `+`. **It must also be set in the deployment environment** —
+  it is baked into the bundle at build time, so a deploy without it opens a chat with
+  nobody and the failure is silent.
+- Confirmed category list, items and prices to replace `supabase/seed.sql`.
+  The vendor can now do this themselves through `/admin` — see
+  [specs/002-admin-menu-management](../../specs/002-admin-menu-management/).
 - Which items really have size/pack variants, and their labels/prices (PRD §11)
 
 ## How a guest order is recorded
